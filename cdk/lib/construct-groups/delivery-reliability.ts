@@ -9,7 +9,7 @@ import { Construct } from "constructs";
 import { ProjectName, ResourceName, createConstructId, createResourceName } from "../common/config";
 
 const RUNBOOK_URL =
-  "https://github.com/aws-samples/sample-amazon-q-business-custom-connector-framework/blob/main/docs/runbooks/delivery-failures.md";
+  "https://github.com/aws-samples/sample-custom-connector-framework-for-knowledge-bases/blob/main/docs/runbooks/delivery-failures.md";
 const ALARM_PERIOD = Duration.minutes(5);
 
 export interface DeliveryResourcesProps {
