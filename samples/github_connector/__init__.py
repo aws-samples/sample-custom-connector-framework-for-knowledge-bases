@@ -1,0 +1,1 @@
+"""GitHub sample connector."""

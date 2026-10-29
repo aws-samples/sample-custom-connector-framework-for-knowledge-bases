@@ -1,0 +1,37 @@
+{
+  "name": "custom-connector-framework-cdk",
+  "version": "0.1.0",
+  "description": "AWS CDK infrastructure for the Custom Connector Framework: the state/orchestration backend, the S3 ingestion bucket, and (optionally) a Bedrock Managed Knowledge Base, plus the example connector jobs.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/jest": "30.0.0",
+    "@types/node": "26.6.6",
+    "aws-cdk": "2.1146.1",
+    "cdk-nag": "2.38.2",
+    "eslint": "10.13.0",
+    "jest": "30.5.2",
+    "prettier": "3.9.10",
+    "ts-jest": "29.4.15",
+    "ts-node": "10.9.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.275.0",
+    "constructs": "10.8.1"
+  }
+}

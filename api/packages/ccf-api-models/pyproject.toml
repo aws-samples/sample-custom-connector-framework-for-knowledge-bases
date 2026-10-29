@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ccf-api-models"
+version = "2025.6.1"
+description = "Pydantic request/response models for the Custom Connector Framework API, generated from the Smithy-emitted OpenAPI."
+requires-python = ">=3.14"
+dependencies = [
+    "pydantic>=2.14.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ccf_api_models"]

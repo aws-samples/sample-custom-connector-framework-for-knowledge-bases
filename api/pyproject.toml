@@ -1,0 +1,25 @@
+[project]
+name = "ccf-api-codegen"
+version = "2025.6.1"
+description = "Smithy source of truth for the Custom Connector Framework API; emits the OpenAPI document and Pydantic models."
+requires-python = ">=3.14"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.17.3",
+    "mypy>=2.4.1",
+    "datamodel-code-generator>=0.87.0",
+    "pydantic>=2.14.2",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true

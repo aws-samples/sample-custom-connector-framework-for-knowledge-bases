@@ -1,5 +1,0 @@
-# ruff.toml
-
-[lint]
-# Ignore TRY300 errors (Consider moving this statement to an `else` block)
-ignore = ["TRY300"]

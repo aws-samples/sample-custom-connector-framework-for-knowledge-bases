@@ -1,0 +1,27 @@
+[project]
+name = "custom-connector-framework-cdk-tests"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "boto3>=1.43.122",
+    "botocore>=1.43.122",
+    "ccf-api-models",
+    "custom-connector-framework-toolkit",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+]
+
+[tool.uv.sources]
+ccf-api-models = { path = "../api/packages/ccf-api-models" }
+custom-connector-framework-toolkit = { path = "../toolkit" }
+
+[tool.ruff]
+target-version = "py314"
+
+[tool.ruff.lint.per-file-ignores]
+"test/*.py" = ["E402"]
