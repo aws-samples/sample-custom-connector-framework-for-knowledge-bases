@@ -14,7 +14,7 @@ current. A connector author writes the code that reads the source. CCF runs that
 code on a schedule or on demand and manages each document's lifecycle in the
 bucket, writing new and changed documents and deleting the ones that disappeared
 from the source. The knowledge base still ingests the bucket and indexes its
-documents for search.
+documents for vector search.
 
 ## Purpose
 
@@ -29,15 +29,13 @@ and
 use it.
 
 A knowledge base can only search documents it has ingested. Ingestion parses
-each document, splits it into passages, and indexes the passages for search.
-Amazon Bedrock, for example, converts each passage into a vector embedding and
-stores it in a vector index. The documents themselves live in source systems
-such as code repositories, issue trackers, and websites, and a connector is the
-code that gets them from a source to the knowledge base and keeps them current
-as they are added, changed, and deleted. With an S3 data source, the knowledge
-base ingests whatever the bucket holds, so a custom connector's job ends at the
-bucket. It keeps the bucket's contents in step with the source, and the
-knowledge base handles ingestion from there.
+each document, splits it into passages, and indexes the passages for vector
+search, which matches a question to the passages closest to it in meaning. The
+documents themselves live in source systems such as code repositories, issue
+trackers, and websites. A built-in connector reads its source and ingests the
+documents directly. With an S3 data source, the knowledge base ingests whatever
+the bucket holds, so a custom connector only has to keep the bucket in step with
+the source, and the knowledge base handles ingestion from there.
 
 Reading the source is a small part of that custom connector. The connector also
 needs somewhere to run on a schedule or on demand, credentials for the source, a
@@ -48,8 +46,9 @@ every connector, so CCF provides it once.
 
 ## Terminology
 
-Knowledge base, RAG, ingestion, and connector are standard terms with the
-meanings described in [Purpose](#purpose). CCF also depends on these AWS terms:
+Knowledge base, RAG, ingestion, vector search, and connector are standard terms
+with the meanings described in [Purpose](#purpose). CCF also depends on these
+AWS terms:
 
 | AWS term                | Meaning                                                                                                                                                                                                                                                                                                                                                           |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
