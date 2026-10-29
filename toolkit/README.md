@@ -143,7 +143,7 @@ boto3 `Session`; it does not put credentials in environment variables.
 
 The S3 bucket, object prefix, and destination mode come only from
 `get_custom_connector(...).service_reference.destination`. The root README's
-[destination table](../README.md#destination-behavior) shows what each mode
+[destination table](../README.md#high-level-design) shows what each mode
 writes. Managed providers append `.txt` to unsupported suffixes, such as
 `.java`, producing `.java.txt` objects. The launcher and connectors make no
 Bedrock SDK calls.
