@@ -4,14 +4,17 @@ Knowledge bases in [Amazon Bedrock](https://aws.amazon.com/bedrock/) and
 [Amazon Quick](https://aws.amazon.com/quick/) include built-in connectors for
 common sources such as SharePoint, Confluence, and Google Drive, but neither
 service implements a connector for every system that holds an organization's
-documents. A source without one, such as a GitHub repository or a GitLab
-project, needs a custom connector. The Custom Connector Framework (CCF) is a
-sample AWS service for building and running custom connectors. A connector
-author writes the code that reads the source, and CCF runs that code on a
-schedule or on demand, copies the documents it returns into the
-[Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) bucket
-the knowledge base reads from, and removes the ones that disappeared from the
-source.
+documents. Both services can also ingest documents from an
+[Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) bucket,
+so a source without a built-in connector, such as a GitHub repository or a
+GitLab project, can still reach a knowledge base if something keeps a current
+copy of its documents in that bucket. The Custom Connector Framework (CCF) is a
+sample AWS service for building the custom connectors that keep that copy
+current. A connector author writes the code that reads the source. CCF runs that
+code on a schedule or on demand and manages each document's lifecycle in the
+bucket, writing new and changed documents and deleting the ones that disappeared
+from the source. The knowledge base still ingests the bucket and indexes its
+documents for search.
 
 ## Purpose
 
@@ -25,19 +28,23 @@ and
 [knowledge bases in Amazon Quick](https://docs.aws.amazon.com/quick/latest/userguide/s3-integration.html)
 use it.
 
-A knowledge base can only search documents it has ingested, meaning read, split,
-and indexed, and those documents start out in source systems such as code
-repositories, issue trackers, and websites. A connector reads a source, copies
-its documents into the knowledge base, and keeps that copy current as documents
-are added, changed, and deleted. Both services can ingest documents from an
-Amazon S3 bucket, so a custom connector can write its source's documents to S3
-and let the knowledge base ingest them from there.
+A knowledge base can only search documents it has ingested. Ingestion parses
+each document, splits it into passages, and indexes the passages for search.
+Amazon Bedrock, for example, converts each passage into a vector embedding and
+stores it in a vector index. The documents themselves live in source systems
+such as code repositories, issue trackers, and websites, and a connector is the
+code that gets them from a source to the knowledge base and keeps them current
+as they are added, changed, and deleted. With an S3 data source, the knowledge
+base ingests whatever the bucket holds, so a custom connector's job ends at the
+bucket. It keeps the bucket's contents in step with the source, and the
+knowledge base handles ingestion from there.
 
 Reading the source is a small part of that custom connector. The connector also
 needs somewhere to run on a schedule or on demand, credentials for the source, a
-record of which documents changed since the last run, write access to the bucket
-without credentials in connector code, and a way to start ingestion after it
-writes. That code is the same for every connector, so CCF provides it once.
+record of which documents it wrote on the last run so it can replace and delete
+the right objects, write access to the bucket without credentials in connector
+code, and a way to start ingestion after it writes. That code is the same for
+every connector, so CCF provides it once.
 
 ## Terminology
 
@@ -47,7 +54,7 @@ meanings described in [Purpose](#purpose). CCF also depends on these AWS terms:
 | AWS term                | Meaning                                                                                                                                                                                                                                                                                                                                                           |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Metadata file (sidecar) | A `<document>.metadata.json` file stored beside a document in S3 that carries the document's title, attributes, and access control list. Amazon Bedrock and Amazon Quick each define the format ([Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-metadata.html), [Quick](https://docs.aws.amazon.com/quick/latest/userguide/s3-metadata.html)). |
-| Data source             | The Amazon Bedrock resource that tells a knowledge base which S3 bucket to ingest documents from.                                                                                                                                                                                                                                                                 |
+| S3 data source          | The knowledge base setting that points it at an S3 bucket to ingest. Amazon Bedrock calls it a data source, and Amazon Quick calls it an [Amazon S3 integration](https://docs.aws.amazon.com/quick/latest/userguide/s3-integration.html).                                                                                                                         |
 | External ID             | A value that an IAM role's trust policy requires on every `AssumeRole` call, so only a caller that knows it can assume the role ([IAM docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html)).                                                                                                                          |
 
 The rest of this README uses CCF's own terms:
@@ -120,9 +127,11 @@ stores connector and job state with configuration encrypted under an
 [AWS Batch](https://aws.amazon.com/batch/) runs the connector image.
 
 Each framework deployment creates its own S3 bucket and writes documents to it
-in one destination mode, chosen at deploy time. The destination mode decides
-which sidecar the toolkit writes beside each document and what CCF does after a
-successful job:
+in one destination mode, chosen at deploy time. In `BEDROCK` mode the framework
+stack also creates the Bedrock knowledge base and its S3 data source for that
+bucket. In `QUICK` mode, the deployer creates the Amazon Quick knowledge base
+against the bucket. The destination mode decides which sidecar the toolkit
+writes beside each document and what CCF does after a successful job:
 
 | Mode      | Toolkit output                                                   | Service action after a successful job                                    |
 | --------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
