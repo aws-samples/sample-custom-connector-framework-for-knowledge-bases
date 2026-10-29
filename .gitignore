@@ -41,17 +41,15 @@ pip-delete-this-directory.txt
 # CDK
 .cdk.staging/
 cdk.out/
+cdk.out.*/
 cdk-outputs.json
 cdk.context.json
-**/cdk.context.json
 **/cdk.context.json
 
 # Environment variables and secrets
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 *.pem
 *.key
 *.cert
@@ -98,11 +96,10 @@ temp/
 # Local development
 .localstack/
 
-# Custom Connector Framework specific
+# Custom Connector Framework generated artifacts
 **/model/*.json
 *-service-model.json
 *-oas30.json
 CustomConnectorFramework-prod-oas30.json
 ccf-service-model.json
-package-lock.json
-**/package-lock.json**
+.kiro

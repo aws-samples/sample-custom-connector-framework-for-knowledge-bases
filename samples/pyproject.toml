@@ -1,0 +1,71 @@
+[project]
+name = "custom-connector-framework-samples"
+version = "0.1.0"
+description = "One-function sample connectors for the Custom Connector Framework toolkit."
+requires-python = ">=3.14"
+dependencies = [
+    "custom-connector-framework-toolkit",
+    "boto3>=1.43.122",
+    "requests>=2.34.2",
+    "beautifulsoup4>=4.15.0",
+    "python-gitlab>=8.6.0",
+    "PyGithub>=2.10.0",
+    "pydantic>=2.14.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-mock>=3.17.0",
+    "coverage>=7.17.0",
+    "requests-mock>=1.12.1",
+    "ruff>=0.17.3",
+    "mypy>=2.4.1",
+    "types-requests>=2.33.0",
+]
+
+[tool.uv.sources]
+custom-connector-framework-toolkit = { path = "../toolkit" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["web_crawler", "gitlab_connector", "github_connector"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S", "C901", "PLR2004"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004", "S105", "S106"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "boto3.*",
+    "botocore.*",
+    "bs4.*",
+    "custom_connector_framework.*",
+    "requests_mock.*",
+    "gitlab.*",
+    "github.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["web_crawler", "gitlab_connector", "github_connector"]
