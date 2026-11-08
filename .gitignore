@@ -95,3 +95,8 @@ temp/
 .localstack/
 
 .kiro
+<<<<<<< HEAD
+=======
+# Reports that agent workflows write into the repository
+.agents/
+>>>>>>> 2eb27a0 (Refactored repository to ensure we can ingest connectors at scale)
