@@ -44,6 +44,16 @@ PROPERTIES: Mapping[str, Any] = MappingProxyType(
     }
 )
 OWNER = {"Name": "owner", "Type": "STRING", "Searchability": "ENABLED"}
+PATH = {"Name": "path", "Type": "STRING", "Searchability": "ENABLED"}
+UPDATE_ERROR_STATUS = MappingProxyType(
+    {
+        ErrorCode.CONFLICT: 409,
+        ErrorCode.THROTTLED: 429,
+        ErrorCode.SERVICE_UNAVAILABLE: 503,
+        ErrorCode.UNAUTHORIZED: 403,
+        ErrorCode.BAD_REQUEST: 400,
+    }
+)
 
 
 def _api_error(status_code: int, code: ErrorCode, message: str) -> CcfApiError:
@@ -61,8 +71,9 @@ class FakeCcfApi:
         self.status = "CREATING_BUCKET"
         self.status_reason: str | None = None
         self.metadata_fields: list[dict[str, str]] = []
-        self.updating = False
-        """The knowledge base is still applying an earlier update, so `UpdateDestination` conflicts."""
+        self.update_error: ErrorCode | None = None
+        """The error `UpdateDestination` returns, for example `CONFLICT` while the knowledge base applies an earlier
+        update."""
         self.exists = True
         self.has_connectors = False
         self._handler = CustomResourceHandler(
@@ -80,8 +91,8 @@ class FakeCcfApi:
 
     def _update(self, request: UpdateDestinationRequest) -> None:
         self.updated.append(request)
-        if self.updating:
-            raise _api_error(409, ErrorCode.CONFLICT, "The knowledge base is still applying an earlier update")
+        if self.update_error is not None:
+            raise _api_error(UPDATE_ERROR_STATUS[self.update_error], self.update_error, "The update failed")
         self.metadata_fields = [field.model_dump(mode="json") for field in request.metadata_fields]
 
     def _create(self, request: CreateDestinationRequest) -> CreateDestinationResponseContent:
@@ -280,13 +291,39 @@ def test_create_sets_the_metadata_fields_once_the_destination_is_active(api: Fak
     assert (update.destination_id, [field.name for field in update.metadata_fields]) == (DESTINATION_ID, ["owner"])
 
 
-def test_a_create_waits_while_the_knowledge_base_applies_an_earlier_update(api: FakeCcfApi) -> None:
+@pytest.mark.parametrize("code", [ErrorCode.CONFLICT, ErrorCode.THROTTLED, ErrorCode.SERVICE_UNAVAILABLE])
+def test_a_create_waits_through_a_retryable_metadata_update_error(api: FakeCcfApi, code: ErrorCode) -> None:
     event = _with_owner({**_event("Create"), "PhysicalResourceId": DESTINATION_ID})
-    api.status, api.updating = "ACTIVE", True
+    api.status, api.update_error = "ACTIVE", code
 
     assert api.is_complete(event) == {"IsComplete": False}
-    api.updating = False
+    api.update_error = None
     assert api.is_complete(event)["IsComplete"] is True
+
+
+@pytest.mark.parametrize("code", [ErrorCode.UNAUTHORIZED, ErrorCode.BAD_REQUEST])
+def test_a_metadata_update_the_api_refuses_fails_the_event(api: FakeCcfApi, code: ErrorCode) -> None:
+    event = _with_owner({**_event("Create"), "PhysicalResourceId": DESTINATION_ID})
+    api.status, api.update_error = "ACTIVE", code
+
+    with pytest.raises(CcfApiError, match="The update failed"):
+        api.is_complete(event)
+
+
+def test_completion_with_the_fields_set_in_another_order_makes_no_update(api: FakeCcfApi) -> None:
+    event = {
+        **_event("Create"),
+        "PhysicalResourceId": DESTINATION_ID,
+        "ResourceProperties": {**PROPERTIES, "MetadataFields": [PATH, OWNER]},
+    }
+    api.status = "ACTIVE"
+    api.metadata_fields = [
+        {"name": "owner", "type": "STRING", "searchability": "ENABLED"},
+        {"name": "path", "type": "STRING", "searchability": "ENABLED"},
+    ]
+
+    assert api.is_complete(event)["IsComplete"] is True
+    assert api.updated == []
 
 
 def test_completion_with_the_fields_already_set_makes_no_update(api: FakeCcfApi) -> None:

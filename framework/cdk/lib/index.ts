@@ -51,6 +51,9 @@ export {
 } from "./stacks/custom-connector-destination-stack";
 export type { CustomConnectorDestinationStackProps } from "./stacks/custom-connector-destination-stack";
 export { readAppEnvironment, readContextPath } from "./common/app-environment";
+export { buildDestinationApp } from "./framework-app";
+export type { DestinationAppRequest } from "./framework-app";
+export { loadDestinationAppConfig } from "./common/destination-config";
 export type { AppEnvironment } from "./common/app-environment";
 export {
   ConfigurationError,

@@ -1,4 +1,4 @@
-"""The user guide's minimal connector implementation runs as written against the testing module."""
+"""The Developer Guide's minimal connector implementation runs as written against the testing module."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from custom_connector_framework.testing import (
     run_implementation,
 )
 
-USER_GUIDE = Path(__file__).resolve().parents[4] / "docs" / "user-guide.md"
+USER_GUIDE = Path(__file__).resolve().parents[4] / "docs" / "developer-guide" / "connector-implementation.md"
 EXAMPLE_BLOCK = re.compile(r"<!-- user-guide-example -->\s*```python\n(?P<code>.*?)```", re.DOTALL)
 CONNECTOR_ID = RunImplementationRequest.model_fields["connector_id"].default
 NOTES = {
@@ -33,7 +33,7 @@ NOTES = {
 def load_example(directory: Path) -> type[ConnectorImplementation]:
     """Write the guide's example block to a module file, import it, and return its `NotesConnector`."""
     match = EXAMPLE_BLOCK.search(USER_GUIDE.read_text(encoding="utf-8"))
-    assert match is not None, "docs/user-guide.md has no block after <!-- user-guide-example -->"
+    assert match is not None, f"{USER_GUIDE} has no block after <!-- user-guide-example -->"
     module_path = directory / "user_guide_example.py"
     module_path.write_text(match.group("code"), encoding="utf-8")
     spec = importlib.util.spec_from_file_location("user_guide_example", module_path)

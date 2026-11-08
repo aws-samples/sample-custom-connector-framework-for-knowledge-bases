@@ -1,0 +1,31 @@
+---
+title: "Sequence: creating a BEDROCK destination"
+---
+sequenceDiagram
+  autonumber
+  participant D as Destination stack
+  box Service account
+    participant A as Framework API
+    participant W as Destination workflow
+  end
+  box Tenant account
+    participant R as Destination role
+    participant S as Destination bucket
+    participant KB as Bedrock knowledge base
+    participant L as Ingestion log group
+  end
+  D->>R: Create the destination role and its boundaries
+  D->>A: CreateDestination
+  A->>W: Save the destination CREATING_BUCKET, start the workflow
+  W->>R: Assume the role with the workflow's ARN as the external ID
+  W->>S: Create the bucket: block public access, SSE-S3, TLS-only policy
+  W->>KB: Create the knowledge base role, the knowledge base, and its data source
+  W->>L: Deliver the knowledge base's ingestion logs
+  W->>A: Record ACTIVE with the resource IDs
+  loop Until ACTIVE or FAILED
+    D->>A: GetDestination
+  end
+  opt The configuration declares metadata fields
+    D->>A: UpdateDestination
+    A->>KB: Set the fields through the destination role
+  end

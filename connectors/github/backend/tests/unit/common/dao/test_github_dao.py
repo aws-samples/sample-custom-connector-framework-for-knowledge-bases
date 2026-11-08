@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from common.exceptions import ArchiveDownloadBrokenError, RepositoryNotFoundError
+from common.exceptions import ArchiveDownloadBrokenError, ArchiveDownloadRefusedError, RepositoryNotFoundError
 from common.models import GitHubRepository
 from tests.unit.conftest import make_github_dao
 from tests.unit.fake_github import FakeGithub, FakeRepository
@@ -71,6 +71,15 @@ def test_an_archive_github_answers_with_404_raises_repository_not_found() -> Non
     fake = FakeRepository("aws-samples/demo", {}, archive_missing=True)
 
     with pytest.raises(RepositoryNotFoundError):
+        with make_github_dao(FakeGithub([fake])).open_archive(_repository(fake)):
+            pass
+
+
+@pytest.mark.parametrize("status", [300, 403, 500])
+def test_an_archive_github_answers_with_another_status_raises_archive_download_refused(status: int) -> None:
+    fake = FakeRepository("aws-samples/demo", {"README.md": b"# Demo\n"}, archive_status=status)
+
+    with pytest.raises(ArchiveDownloadRefusedError, match=f"aws-samples/demo with HTTP {status}"):
         with make_github_dao(FakeGithub([fake])).open_archive(_repository(fake)):
             pass
 

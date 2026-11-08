@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 732" width="1000" height="732">
+  <title>Your documents, kept in sync, wherever your teams search</title>
+  <desc>A hub-and-spoke view of the Custom Connector Framework. Text-based document sources such as code repositories, wikis, ticketing systems, knowledge articles, and file shares connect to the framework at the hub, which keeps an Amazon Bedrock knowledge base, AWS Quick, or Amazon S3 in sync. The benefits listed below are faster time to value, faster time to production, managed connector infrastructure, full and incremental sync, your data staying in your account, and one service for every team.</desc>
+  <defs>
+    <linearGradient id="hero-background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2F8FD"/>
+      <stop offset="1" stop-color="#E9F8F1"/>
+    </linearGradient>
+    <linearGradient id="hero-hub" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="hero-hub-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <linearGradient id="hero-dot" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38D1E0"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="hero-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0B1F3A" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="hero-spoke-0" x1="400.3" y1="182.3" x2="439.7" y2="232.8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-1" x1="354.4" y1="239.0" x2="411.9" y2="267.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-2" x1="338.0" y1="310.0" x2="402.0" y2="310.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-3" x1="354.4" y1="381.0" x2="411.9" y2="353.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-4" x1="400.3" y1="437.7" x2="439.7" y2="387.2" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-5" x1="583.1" y1="258.1" x2="637.4" y2="224.2" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-6" x1="598.0" y1="310.0" x2="662.0" y2="310.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <linearGradient id="hero-spoke-7" x1="583.1" y1="361.9" x2="637.4" y2="395.8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <!-- Logo definitions, copied from docs/assets/images/logo.svg. -->
+    <linearGradient id="ccf-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="ccf-source" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7DB9FF"/>
+      <stop offset="1" stop-color="#3B8DF5"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-0" x1="22.0" y1="60.0" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-1" x1="35.8" y1="31.6" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-2" x1="35.8" y1="88.4" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-3" x1="66.7" y1="25.1" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-4" x1="66.7" y1="94.9" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-hub" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#8BF0AE"/>
+      <stop offset="1" stop-color="#22C3B0"/>
+    </linearGradient>
+    <linearGradient id="ccf-delivery" x1="70" y1="0" x2="106" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="ccf-lift" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#06121F" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="732" fill="url(#hero-background)"/>
+  <text x="500" y="52" font-family="Helvetica" font-size="30" font-weight="bold" text-anchor="middle" fill="#0B1F3A">Your documents, kept in sync, wherever your teams search</text>
+  <text x="500" y="84" font-family="Helvetica" font-size="18" text-anchor="middle" fill="#4A5A6A">You write the code that reads your source. CCF manages everything else.</text>
+  <circle id="orbit" cx="500.0" cy="310.0" r="196.0" fill="none" stroke="#D3E6F1" stroke-width="24" stroke-opacity="0.7"/>
+  <g id="spokes">
+    <line x1="400.3" y1="182.3" x2="439.7" y2="232.8" stroke="url(#hero-spoke-0)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="354.4" y1="239.0" x2="411.9" y2="267.0" stroke="url(#hero-spoke-1)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="338.0" y1="310.0" x2="402.0" y2="310.0" stroke="url(#hero-spoke-2)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="354.4" y1="381.0" x2="411.9" y2="353.0" stroke="url(#hero-spoke-3)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="400.3" y1="437.7" x2="439.7" y2="387.2" stroke="url(#hero-spoke-4)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="583.1" y1="258.1" x2="637.4" y2="224.2" stroke="url(#hero-spoke-5)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="598.0" y1="310.0" x2="662.0" y2="310.0" stroke="url(#hero-spoke-6)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="583.1" y1="361.9" x2="637.4" y2="395.8" stroke="url(#hero-spoke-7)" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g id="hub">
+    <circle cx="500.0" cy="310.0" r="98.0" fill="none" stroke="url(#hero-hub-ring)" stroke-width="3"/>
+    <circle cx="500.0" cy="310.0" r="92.0" fill="url(#hero-hub)" filter="url(#hero-soft)"/>
+    <g id="ccf-logo" transform="translate(454.0,234.0) scale(0.7667)">
+      <circle id="ccf-orbit" cx="58.0" cy="60.0" r="36.0" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12"/>
+      <g id="ccf-spokes">
+        <path d="M22.0 61.8 L58.0 64.2 L58.0 55.8 L22.0 58.2 Z" fill="url(#ccf-spoke-0)"/>
+        <path d="M34.4 32.7 L54.7 62.6 L61.3 57.4 L37.3 30.5 Z" fill="url(#ccf-spoke-1)"/>
+        <path d="M37.3 89.5 L61.3 62.6 L54.7 57.4 L34.4 87.3 Z" fill="url(#ccf-spoke-2)"/>
+        <path d="M65.0 24.6 L53.9 59.0 L62.1 61.0 L68.5 25.5 Z" fill="url(#ccf-spoke-3)"/>
+        <path d="M68.5 94.5 L62.1 59.0 L53.9 61.0 L65.0 95.4 Z" fill="url(#ccf-spoke-4)"/>
+      </g>
+      <path id="ccf-delivery-spoke" d="M70 55 L101 55 A5 5 0 0 1 101 65 L70 65 Z" fill="url(#ccf-delivery)"/>
+      <g id="ccf-sources" fill="url(#ccf-source)" filter="url(#ccf-lift)">
+        <circle cx="22.0" cy="60.0" r="6.5"/>
+        <circle cx="35.8" cy="31.6" r="6.5"/>
+        <circle cx="35.8" cy="88.4" r="6.5"/>
+        <circle cx="66.7" cy="25.1" r="6.5"/>
+        <circle cx="66.7" cy="94.9" r="6.5"/>
+      </g>
+      <g id="ccf-hub-node" filter="url(#ccf-lift)">
+        <circle cx="58.0" cy="60.0" r="15" fill="url(#ccf-hub)"/>
+        <circle cx="58.0" cy="60.0" r="5.5" fill="#0D3550"/>
+      </g>
+    </g>
+    <text x="500.0" y="346.0" font-family="Helvetica" font-size="17" font-weight="bold" text-anchor="middle" fill="#FFFFFF">Custom Connector</text>
+    <text x="500.0" y="367.0" font-family="Helvetica" font-size="17" font-weight="bold" text-anchor="middle" fill="url(#hero-wordmark)">Framework</text>
+  </g>
+  <g id="sources">
+    <g id="source-code-repositories">
+      <circle cx="379.3" cy="155.5" r="30" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:lucide/git-branch" x="364.3" y="140.5" width="30" height="30" color="#1F6FD1"/>
+      <text x="337.3" y="161.5" font-family="Helvetica" font-size="18" text-anchor="end" fill="#0B1F3A">Code repositories</text>
+    </g>
+    <g id="source-wikis">
+      <circle cx="323.8" cy="224.1" r="30" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:lucide/book-open" x="308.8" y="209.1" width="30" height="30" color="#1F6FD1"/>
+      <text x="281.8" y="230.1" font-family="Helvetica" font-size="18" text-anchor="end" fill="#0B1F3A">Wikis</text>
+    </g>
+    <g id="source-ticketing-systems">
+      <circle cx="304.0" cy="310.0" r="30" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:lucide/ticket" x="289.0" y="295.0" width="30" height="30" color="#1F6FD1"/>
+      <text x="262.0" y="316.0" font-family="Helvetica" font-size="18" text-anchor="end" fill="#0B1F3A">Ticketing systems</text>
+    </g>
+    <g id="source-knowledge-articles">
+      <circle cx="323.8" cy="395.9" r="30" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:lucide/file-text" x="308.8" y="380.9" width="30" height="30" color="#1F6FD1"/>
+      <text x="281.8" y="401.9" font-family="Helvetica" font-size="18" text-anchor="end" fill="#0B1F3A">Knowledge articles</text>
+    </g>
+    <g id="source-file-shares">
+      <circle cx="379.3" cy="464.5" r="30" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:lucide/folder-open" x="364.3" y="449.5" width="30" height="30" color="#1F6FD1"/>
+      <text x="337.3" y="470.5" font-family="Helvetica" font-size="18" text-anchor="end" fill="#0B1F3A">File shares</text>
+    </g>
+  </g>
+  <g id="destinations">
+    <g id="destination-amazon-bedrock">
+      <circle cx="666.2" cy="206.1" r="32" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:aws/amazon-bedrock" x="647.2" y="187.1" width="38" height="38"/>
+      <text x="710.2" y="204.1" font-family="Helvetica" font-size="18" font-weight="bold" fill="#0B1F3A">Amazon Bedrock</text>
+      <text x="710.2" y="225.1" font-family="Helvetica" font-size="15" fill="#4A5A6A">knowledge bases</text>
+    </g>
+    <g id="destination-aws-quick">
+      <circle cx="696.0" cy="310.0" r="32" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:aws/amazon-quick" x="677.0" y="291.0" width="38" height="38"/>
+      <text x="740.0" y="308.0" font-family="Helvetica" font-size="18" font-weight="bold" fill="#0B1F3A">AWS Quick</text>
+      <text x="740.0" y="329.0" font-family="Helvetica" font-size="15" fill="#4A5A6A">chat and agents</text>
+    </g>
+    <g id="destination-amazon-s3">
+      <circle cx="666.2" cy="413.9" r="32" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#hero-soft)"/>
+      <use href="icon:aws/amazon-simple-storage-service" x="647.2" y="394.9" width="38" height="38"/>
+      <text x="710.2" y="411.9" font-family="Helvetica" font-size="18" font-weight="bold" fill="#0B1F3A">Amazon S3</text>
+      <text x="710.2" y="432.9" font-family="Helvetica" font-size="15" fill="#4A5A6A">your own pipeline</text>
+    </g>
+  </g>
+  <g id="benefits">
+    <rect x="162.0" y="548.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="186.0" cy="570.0" r="7" fill="url(#hero-dot)"/>
+    <text x="202.0" y="576.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Faster time to value</text>
+    <rect x="508.0" y="548.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="532.0" cy="570.0" r="7" fill="url(#hero-dot)"/>
+    <text x="548.0" y="576.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Faster time to production</text>
+    <rect x="162.0" y="604.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="186.0" cy="626.0" r="7" fill="url(#hero-dot)"/>
+    <text x="202.0" y="632.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Managed connector infrastructure</text>
+    <rect x="508.0" y="604.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="532.0" cy="626.0" r="7" fill="url(#hero-dot)"/>
+    <text x="548.0" y="632.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Full and incremental sync</text>
+    <rect x="162.0" y="660.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="186.0" cy="682.0" r="7" fill="url(#hero-dot)"/>
+    <text x="202.0" y="688.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Your data stays in your account</text>
+    <rect x="508.0" y="660.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="532.0" cy="682.0" r="7" fill="url(#hero-dot)"/>
+    <text x="548.0" y="688.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">One service for every team</text>
+  </g>
+</svg>

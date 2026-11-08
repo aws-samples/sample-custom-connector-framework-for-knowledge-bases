@@ -1,9 +1,9 @@
 # API model
 
 This folder is the source of the framework API's contract. The Smithy model in
-[`model/`](./model) declares the 22 operations, their shapes, HTTP bindings,
-errors, and constraints. The build turns it into the OpenAPI document that API
-Gateway serves and validates requests with. It also generates the Pydantic
+[`model/`](./model) declares every operation, its shapes, HTTP bindings,
+errors, and constraints. The build turns it into the OpenAPI document that [Amazon API
+Gateway](https://aws.amazon.com/api-gateway/) serves and validates requests with. It also generates the Pydantic
 models in [`packages/ccf-api-models`](./packages/ccf-api-models) that the
 backend, the toolkit's `CcfClient`, and the CDK custom resources use. The repository keeps
 no other list of operations or routes.
@@ -15,28 +15,29 @@ checking the release's SHA-256. `make build` runs the generation chain:
 
 1. `smithy ast` writes `generated/model.json`.
 1. `smithy build` writes the OpenAPI document, which the build copies to
-   `generated/openapi.json`. `codegen/enrich_openapi.py` then adds the API
-   Gateway request validator, the Lambda integration placeholder, and the
-   `x-ccf-*` metadata the client and the CDK app read: which members sit in the
-   path, query, header, or body, which operations a runtime role may call, and
-   which are safe to retry.
+   `generated/openapi.json`. `codegen/enrich_openapi.py` then adds API
+   Gateway's request validator and error responses, and the `x-ccf-*`
+   extensions that the client, the backend, and the CDK app read: each member's
+   name, which callers may call each operation, its client token member, and
+   whether it's safe to retry.
 1. `datamodel-codegen` writes the strict Pydantic models to
    `packages/ccf-api-models/src/ccf_api_models/models.py`.
+1. `codegen/write_enums.py` writes `operations.py`, with the `Operation` enum
+   and the typed `CcfApi` protocol, and `metric_names.py` and `job_container.py`.
+   The build then copies the OpenAPI document into the package.
 
 `make check` validates the Smithy model, regenerates the contract into
-`build/check/`, and fails when the tracked generated files differ from it. It
-lints and type-checks `codegen/` and the models package's `base.py`, runs the
-generated-model assertions, and then runs `codegen/assert_contract.py`, which checks
-each operation's members, locations, and required fields, and the retry-safe
-set.
-`make test` exercises the generated models. `generated/` is build output and
-isn't checked in. Change the Smithy model, never the generated files.
+`build/check/`, and fails when a tracked generated file differs from it. It
+then lints and type-checks `codegen/`, `tests/`, and the models package, and
+runs the tests. `make test` runs the tests only. The generated files are
+checked in, so change the Smithy model and run `make build`, never edit the
+generated files.
 
 ## Operations and fields
 
 The table lists every operation with its request members and its response,
 taken from `generated/openapi.json`. A `?` marks an optional member. The
-[user guide](../../docs/user-guide.md#call-the-api) explains each operation,
+[API Reference](https://aws-samples.github.io/sample-custom-connector-framework-for-knowledge-bases/api-reference/) explains each operation,
 its callers, and its errors.
 
 <!-- api-fields:start -->

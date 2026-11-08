@@ -209,7 +209,7 @@ export const CONNECTOR_OPS_ACKNOWLEDGMENTS: readonly NagAcknowledgment[] = [
 
 /** The reason for a provider's wildcard grants; each provider names its own findings. */
 export const CONNECTOR_OPS_WILDCARD_REASON =
-  "Each handler may call only the framework API routes DESIGN.md lists for it: the * segments are " +
+  "Each handler may call only the framework API routes the API Reference's caller table lists for it: the * segments are " +
   "the stage and the destination and custom connector IDs, which the framework assigns at run time. The CDK " +
   "Provider framework invokes only versions of its own handler functions, and its waiter state machine " +
   "writes only to its log group through log delivery actions that take no resource.";

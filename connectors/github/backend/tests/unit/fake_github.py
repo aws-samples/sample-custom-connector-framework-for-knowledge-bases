@@ -42,6 +42,8 @@ class FakeRepository:
     """How many of the next archive downloads break off halfway, the way a dropped connection does."""
     tags: frozenset[str] = frozenset()
     """Tag names. GitHub answers 300, not a redirect, to an archive of a short ref that is also a tag."""
+    archive_status: int = _OK
+    """The status the archive download answers with when the archive exists."""
 
     @property
     def owner(self) -> str:
@@ -183,9 +185,6 @@ class _ArchiveResponse:
     ) -> None:
         return None
 
-    def raise_for_status(self) -> None:
-        assert self.status_code == _OK
-
 
 class FakeArchiveSession:
     """Serves the default branch's tarball an archive URL names, or 404, in small chunks."""
@@ -211,4 +210,4 @@ class FakeArchiveSession:
         self._github.downloads.append(repository.full_name)
         broken = repository.broken_downloads > 0
         repository.broken_downloads -= int(broken)
-        return _ArchiveResponse(_OK, repository.tarball(), self._chunk_bytes, broken)
+        return _ArchiveResponse(repository.archive_status, repository.tarball(), self._chunk_bytes, broken)

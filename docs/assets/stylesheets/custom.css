@@ -1,0 +1,82 @@
+/* Colors from the CCF logo: a deep blue tile, blue sources, and a green hub. */
+:root > * {
+  --ccf-navy: #0B1F3A;
+  --ccf-deep-teal: #0E4A5C;
+  --ccf-blue: #1F6FD1;
+  --ccf-teal: #11998A;
+  --ccf-mint: #7EE8A2;
+  --md-primary-fg-color: var(--ccf-navy);
+  --md-primary-fg-color--light: var(--ccf-deep-teal);
+  --md-primary-fg-color--dark: #07162A;
+  --md-accent-fg-color: var(--ccf-teal);
+  --md-accent-fg-color--transparent: rgba(17, 153, 138, 0.1);
+  --md-typeset-a-color: var(--ccf-blue);
+}
+
+/* The header and tabs carry the logo tile's blue-to-teal gradient. */
+.md-header,
+.md-tabs {
+  background: linear-gradient(120deg, var(--ccf-navy) 0%, var(--ccf-deep-teal) 100%);
+  color: #FFFFFF;
+}
+
+.md-header .md-header__title,
+.md-header .md-header__button,
+.md-header .md-source,
+.md-tabs .md-tabs__link {
+  color: #FFFFFF;
+}
+
+.md-tabs .md-tabs__link {
+  opacity: 0.75;
+}
+
+.md-tabs .md-tabs__item--active .md-tabs__link,
+.md-tabs .md-tabs__link:hover {
+  color: var(--ccf-mint);
+  opacity: 1;
+}
+
+.md-header .md-search__input {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.md-header .md-search__input::placeholder,
+.md-header .md-search__icon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.md-header__button.md-logo img {
+  height: 1.6rem;
+  border-radius: 0.3rem;
+}
+
+/* A thin blue-to-green rule under the header, like the logo's spokes. */
+.md-header::after {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #4F9DFF 0%, #2DD4BF 50%, var(--ccf-mint) 100%);
+}
+
+/* Bold text in benefit paragraphs picks up the logo's deep blue. */
+.md-typeset strong {
+  color: var(--ccf-navy);
+}
+
+[data-md-color-scheme="slate"] .md-typeset strong {
+  color: inherit;
+}
+
+/* Figures span the content width and keep their captions close. */
+.md-content img {
+  display: block;
+  margin: 0 auto;
+}
+
+.md-content img + em {
+  display: block;
+  margin-top: 0.4em;
+  text-align: center;
+}

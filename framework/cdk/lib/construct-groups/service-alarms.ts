@@ -9,8 +9,9 @@ import {
 } from "../common/contracts";
 import { ALARM_PERIOD, AlarmSeverity, SeverityAlarm } from "../constructs/severity-alarm";
 
-/** The repository path of the runbook every framework alarm links to. */
-export const DELIVERY_RUNBOOK = "framework/docs/runbooks/delivery-failures.md";
+/** The documentation site's page of the runbook every framework alarm links to. */
+export const DELIVERY_RUNBOOK =
+  "https://aws-samples.github.io/sample-custom-connector-framework-for-knowledge-bases/administrator-guide/runbook-delivery-failures/";
 
 /** The runbook sections the framework's alarms link to. */
 export enum DeliveryRunbookSection {

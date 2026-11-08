@@ -20,7 +20,7 @@ export interface SeverityAlarmProps {
   readonly severity: AlarmSeverity;
   /** What the alarm means, in one sentence. */
   readonly summary: string;
-  /** The runbook path and section, such as `framework/docs/runbooks/delivery-failures.md#jobs-stream`. */
+  /** The runbook URL and section, such as `<DELIVERY_RUNBOOK>#failed-jobs`. */
   readonly runbook: string;
   readonly topic: ITopic;
   /** Defaults to 0 with `GREATER_THAN_THRESHOLD`. */

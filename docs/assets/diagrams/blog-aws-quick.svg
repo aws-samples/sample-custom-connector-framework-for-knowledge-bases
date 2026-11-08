@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 666" width="1000" height="666">
+  <title>Bring more of your knowledge into AWS Quick</title>
+  <desc>Text-based sources that AWS Quick has no built-in connector for, such as GitHub organizations, internal wikis, and ticketing systems, feed the Custom Connector Framework. It keeps AWS Quick current, through an Amazon Bedrock knowledge base or an Amazon S3 bucket. The benefits listed below are faster time to value, an index that stays current, control over what AWS Quick sees, and data that stays with its owner.</desc>
+  <defs>
+    <linearGradient id="blog-aws-quick-background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2F8FD"/>
+      <stop offset="1" stop-color="#E9F8F1"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-hub" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-hub-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-dot" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38D1E0"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="blog-aws-quick-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0B1F3A" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="blog-aws-quick-spoke-0" x1="380.5" y1="199.7" x2="428.0" y2="239.6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-spoke-1" x1="344.0" y1="300.0" x2="406.0" y2="300.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-spoke-2" x1="380.5" y1="400.3" x2="428.0" y2="360.4" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="blog-aws-quick-spoke-3" x1="594.0" y1="300.0" x2="656.0" y2="300.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <!-- Logo definitions, copied from docs/assets/images/logo.svg. -->
+    <linearGradient id="ccf-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="ccf-source" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7DB9FF"/>
+      <stop offset="1" stop-color="#3B8DF5"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-0" x1="22.0" y1="60.0" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-1" x1="35.8" y1="31.6" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-2" x1="35.8" y1="88.4" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-3" x1="66.7" y1="25.1" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-4" x1="66.7" y1="94.9" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-hub" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#8BF0AE"/>
+      <stop offset="1" stop-color="#22C3B0"/>
+    </linearGradient>
+    <linearGradient id="ccf-delivery" x1="70" y1="0" x2="106" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="ccf-lift" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#06121F" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="666" fill="url(#blog-aws-quick-background)"/>
+  <text x="500.0" y="52" font-family="Helvetica" font-size="30" font-weight="bold" text-anchor="middle" fill="#0B1F3A">Bring more of your knowledge into AWS Quick</text>
+  <text x="500.0" y="84" font-family="Helvetica" font-size="18" text-anchor="middle" fill="#4A5A6A">Connect a document source once. CCF keeps it current for AWS Quick.</text>
+  <circle cx="500.0" cy="300.0" r="190.0" fill="none" stroke="#D3E6F1" stroke-width="24" stroke-opacity="0.7"/>
+  <g id="spokes">
+    <line x1="380.5" y1="199.7" x2="428.0" y2="239.6" stroke="url(#blog-aws-quick-spoke-0)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="344.0" y1="300.0" x2="406.0" y2="300.0" stroke="url(#blog-aws-quick-spoke-1)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="380.5" y1="400.3" x2="428.0" y2="360.4" stroke="url(#blog-aws-quick-spoke-2)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="594.0" y1="300.0" x2="656.0" y2="300.0" stroke="url(#blog-aws-quick-spoke-3)" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g id="hub">
+    <circle cx="500.0" cy="300.0" r="94.0" fill="none" stroke="url(#blog-aws-quick-hub-ring)" stroke-width="3"/>
+    <circle cx="500.0" cy="300.0" r="88.0" fill="url(#blog-aws-quick-hub)" filter="url(#blog-aws-quick-soft)"/>
+    <g id="ccf-logo" transform="translate(456.0,226.0) scale(0.7333)">
+    <circle id="ccf-orbit" cx="58.0" cy="60.0" r="36.0" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12"/>
+    <g id="ccf-spokes">
+      <path d="M22.0 61.8 L58.0 64.2 L58.0 55.8 L22.0 58.2 Z" fill="url(#ccf-spoke-0)"/>
+      <path d="M34.4 32.7 L54.7 62.6 L61.3 57.4 L37.3 30.5 Z" fill="url(#ccf-spoke-1)"/>
+      <path d="M37.3 89.5 L61.3 62.6 L54.7 57.4 L34.4 87.3 Z" fill="url(#ccf-spoke-2)"/>
+      <path d="M65.0 24.6 L53.9 59.0 L62.1 61.0 L68.5 25.5 Z" fill="url(#ccf-spoke-3)"/>
+      <path d="M68.5 94.5 L62.1 59.0 L53.9 61.0 L65.0 95.4 Z" fill="url(#ccf-spoke-4)"/>
+    </g>
+    <path id="ccf-delivery-spoke" d="M70 55 L101 55 A5 5 0 0 1 101 65 L70 65 Z" fill="url(#ccf-delivery)"/>
+    <g id="ccf-sources" fill="url(#ccf-source)" filter="url(#ccf-lift)">
+      <circle cx="22.0" cy="60.0" r="6.5"/>
+      <circle cx="35.8" cy="31.6" r="6.5"/>
+      <circle cx="35.8" cy="88.4" r="6.5"/>
+      <circle cx="66.7" cy="25.1" r="6.5"/>
+      <circle cx="66.7" cy="94.9" r="6.5"/>
+    </g>
+    <g id="ccf-hub-node" filter="url(#ccf-lift)">
+      <circle cx="58.0" cy="60.0" r="15" fill="url(#ccf-hub)"/>
+      <circle cx="58.0" cy="60.0" r="5.5" fill="#0D3550"/>
+    </g>
+    </g>
+    <text x="500.0" y="336.0" font-family="Helvetica" font-size="17" font-weight="bold" text-anchor="middle" fill="#FFFFFF">Custom Connector</text>
+    <text x="500.0" y="357.0" font-family="Helvetica" font-size="17" font-weight="bold" text-anchor="middle" fill="url(#blog-aws-quick-wordmark)">Framework</text>
+  </g>
+  <g id="badges">
+    <g id="blog-aws-quick-github-organizations">
+      <circle cx="354.5" cy="177.9" r="31" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#blog-aws-quick-soft)"/>
+      <use href="icon:lucide/git-branch" x="339.5" y="162.9" width="30" height="30" color="#1F6FD1"/>
+      <text x="310.5" y="183.9" font-family="Helvetica" font-size="18" font-weight="bold" text-anchor="end" fill="#0B1F3A">GitHub organizations</text>
+    </g>
+    <g id="blog-aws-quick-internal-wikis">
+      <circle cx="310.0" cy="300.0" r="31" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#blog-aws-quick-soft)"/>
+      <use href="icon:lucide/book-open" x="295.0" y="285.0" width="30" height="30" color="#1F6FD1"/>
+      <text x="266.0" y="306.0" font-family="Helvetica" font-size="18" font-weight="bold" text-anchor="end" fill="#0B1F3A">Internal wikis</text>
+    </g>
+    <g id="blog-aws-quick-ticketing-systems">
+      <circle cx="354.5" cy="422.1" r="31" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#blog-aws-quick-soft)"/>
+      <use href="icon:lucide/ticket" x="339.5" y="407.1" width="30" height="30" color="#1F6FD1"/>
+      <text x="310.5" y="428.1" font-family="Helvetica" font-size="18" font-weight="bold" text-anchor="end" fill="#0B1F3A">Ticketing systems</text>
+    </g>
+    <g id="blog-aws-quick-aws-quick">
+      <circle cx="690.0" cy="300.0" r="31" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5" filter="url(#blog-aws-quick-soft)"/>
+      <use href="icon:aws/amazon-quick" x="671.0" y="281.0" width="38" height="38"/>
+      <text x="734.0" y="298.0" font-family="Helvetica" font-size="18" font-weight="bold" fill="#0B1F3A">AWS Quick</text>
+      <text x="734.0" y="319.0" font-family="Helvetica" font-size="15" fill="#4A5A6A">through Bedrock or Amazon S3</text>
+    </g>
+  </g>
+  <g id="benefits">
+    <rect x="162.0" y="538.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="186.0" cy="560.0" r="7" fill="url(#blog-aws-quick-dot)"/>
+    <text x="202.0" y="566.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Faster time to value</text>
+    <rect x="508.0" y="538.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="532.0" cy="560.0" r="7" fill="url(#blog-aws-quick-dot)"/>
+    <text x="548.0" y="566.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">An index that stays current</text>
+    <rect x="162.0" y="594.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="186.0" cy="616.0" r="7" fill="url(#blog-aws-quick-dot)"/>
+    <text x="202.0" y="622.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">You decide what AWS Quick sees</text>
+    <rect x="508.0" y="594.0" width="330.0" height="44" rx="22" fill="#FFFFFF" stroke="#CFE3EE" stroke-width="1.5"/>
+    <circle cx="532.0" cy="616.0" r="7" fill="url(#blog-aws-quick-dot)"/>
+    <text x="548.0" y="622.0" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Data stays with its owner</text>
+  </g>
+</svg>

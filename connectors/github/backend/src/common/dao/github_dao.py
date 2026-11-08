@@ -23,13 +23,14 @@ from github import UnknownObjectException
 from pydantic import BaseModel, ConfigDict
 from urllib3.exceptions import ProtocolError, ReadTimeoutError
 
-from common.exceptions import ArchiveDownloadBrokenError, RepositoryNotFoundError
+from common.exceptions import ArchiveDownloadBrokenError, ArchiveDownloadRefusedError, RepositoryNotFoundError
 from common.models import GitHubRepository
 
 SEARCH_PAGE_SIZE = 100
 """The most results GitHub returns per page. `github_connector` sets PyGithub's `per_page` to it."""
 _ARCHIVE_FORMAT = "tarball"
 _BRANCH_REF_PREFIX = "refs/heads/"
+_OK = 200
 _NOT_FOUND = 404
 
 
@@ -93,7 +94,6 @@ class ArchiveResponse(Protocol):
     def raw(self) -> Any:
         """urllib3's response stream; `types-requests` types it `Any`, so this boundary does too."""
 
-    def raise_for_status(self) -> None: ...
     def __enter__(self) -> ArchiveResponse: ...
     def __exit__(
         self,
@@ -136,8 +136,8 @@ class GitHubDao:
     def open_archive(self, repository: GitHubRepository) -> Iterator[BinaryIO]:
         """Yield the default branch's gzipped tarball as a stream read from the network.
 
-        Raises `RepositoryNotFoundError` when GitHub no longer has the repository, and
-        `ArchiveDownloadBrokenError` when the connection breaks while the caller reads.
+        Raises `RepositoryNotFoundError` when GitHub no longer has the repository, `ArchiveDownloadRefusedError` for
+        any other status but 200, and `ArchiveDownloadBrokenError` when the connection breaks while the caller reads.
         """
         missing = RepositoryNotFoundError(f"GitHub has no archive of {repository.full_name}.")
         try:
@@ -150,7 +150,11 @@ class GitHubDao:
         with self._archive_session.get(url, stream=True, timeout=self._request_timeout_seconds) as response:
             if response.status_code == _NOT_FOUND:
                 raise missing
-            response.raise_for_status()
+            # Anything but 200, a 300 included, is not the archive.
+            if response.status_code != _OK:
+                raise ArchiveDownloadRefusedError(
+                    f"GitHub answered the archive download of {repository.full_name} with HTTP {response.status_code}."
+                )
             # Undo any HTTP content encoding, so the stream is the archive file itself.
             response.raw.decode_content = True
             try:
