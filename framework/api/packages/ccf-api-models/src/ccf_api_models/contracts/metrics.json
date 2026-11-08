@@ -1,0 +1,20 @@
+{
+  "namespace": "CustomConnectorFramework",
+  "dimensions": {
+    "STATUS": "Status",
+    "CONNECTOR_ID": "ConnectorId",
+    "OPERATION": "Operation",
+    "ERROR_CODE": "ErrorCode"
+  },
+  "metrics": {
+    "JOBS_COMPLETED": { "name": "JobsCompleted", "unit": "Count", "dimensionSets": [["STATUS"], ["STATUS", "CONNECTOR_ID"]] },
+    "JOB_DURATION": { "name": "JobDuration", "unit": "Seconds", "dimensionSets": [["CONNECTOR_ID"]] },
+    "DOCUMENTS_RECORDED": { "name": "DocumentsRecorded", "unit": "Count", "dimensionSets": [["CONNECTOR_ID"]] },
+    "DOCUMENTS_DELETED": { "name": "DocumentsDeleted", "unit": "Count", "dimensionSets": [["CONNECTOR_ID"]] },
+    "COLLECTIONS_DELETED": { "name": "CollectionsDeleted", "unit": "Count", "dimensionSets": [["CONNECTOR_ID"]] },
+    "API_ERRORS": { "name": "ApiErrors", "unit": "Count", "dimensionSets": [["OPERATION", "ERROR_CODE"]] },
+    "INGESTION_JOBS_STARTED": { "name": "IngestionJobsStarted", "unit": "Count", "dimensionSets": [[]] },
+    "INGESTION_JOBS_FAILED": { "name": "IngestionJobsFailed", "unit": "Count", "dimensionSets": [[]] },
+    "DESTINATION_CREATION_FAILED": { "name": "DestinationCreationFailed", "unit": "Count", "dimensionSets": [[]] }
+  }
+}

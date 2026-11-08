@@ -1,0 +1,50 @@
+[project]
+name = "custom-connector-framework-cdk-tests"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "boto3>=1.43.126",
+    "botocore>=1.43.126",
+    "ccf-api-models",
+    "custom-connector-framework-toolkit",
+]
+
+[dependency-groups]
+dev = [
+    "boto3-stubs>=1.43.126",
+    "jsonschema>=4.26.0",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.4",
+    "types-jsonschema>=4.26.0",
+]
+
+[tool.uv.sources]
+ccf-api-models = { path = "../api/packages/ccf-api-models" }
+custom-connector-framework-toolkit = { path = "../toolkit" }
+
+[tool.ruff]
+extend = "../ruff.toml"
+
+[tool.ruff.lint]
+# UP042 (StrEnum) is off: the handlers' finite value sets are `(str, Enum)`, as in the toolkit.
+extend-ignore = ["UP042"]
+
+[tool.ruff.lint.isort]
+# The Lambda handlers' modules, imported by name from their folder.
+known-first-party = ["ccf", "custom_resource", "destination", "image_build", "register", "runtime_package_init"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literal expected values and counts (PLR2004).
+"test/**" = ["S101", "PLR2004"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+plugins = ["pydantic.mypy"]
+mypy_path = "lambdas/connector_ops"
+
+[tool.pytest.ini_options]
+# The Lambda handlers' folder, and the live sources of the API models and the toolkit,
+# ahead of the installed copies.
+pythonpath = ["lambdas/connector_ops", "../api/packages/ccf-api-models/src", "../toolkit/src"]

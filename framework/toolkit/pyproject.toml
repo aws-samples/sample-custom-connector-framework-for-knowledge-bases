@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "custom-connector-framework-toolkit"
+version = "0.1.0"
+description = "Toolkit for custom connectors: the job runner, the document store that writes to a tenant destination for Amazon Bedrock Knowledge Bases, Amazon Quick, or plain S3, the framework API client, and a testing module."
+requires-python = ">=3.14"
+dependencies = [
+    "boto3>=1.43.126,<2",
+    "pydantic>=2.14.3,<3",
+    "pydantic-settings>=2.16.2,<3",
+    "filetype>=1.2.0,<2",
+    "ccf-api-models",
+]
+
+[project.scripts]
+ccf-connector = "custom_connector_framework.launcher:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-mock>=3.17.0",
+    "coverage>=7.17.2",
+    "moto[s3]>=5.2.5",
+    "ruff>=0.17.4",
+    "mypy>=2.4.1",
+    "boto3-stubs[s3,secretsmanager,sts]>=1.43.126",
+]
+
+[tool.uv.sources]
+ccf-api-models = { path = "../api/packages/ccf-api-models" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/custom_connector_framework"]
+
+[tool.ruff]
+extend = "../ruff.toml"
+
+[tool.ruff.lint]
+# UP042 (StrEnum) is off: the toolkit's finite value sets are `(str, Enum)`, whose members are plain `str` subclasses.
+extend-ignore = ["UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literal expected values and counts (PLR2004).
+"tests/**" = ["S101", "PLR2004"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+# Reads Field(None, ...) defaults on the generated models, so optional request members stay optional.
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.uv]
+# Rebuild consumers' installed copy whenever the package sources change.
+cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.py" }]

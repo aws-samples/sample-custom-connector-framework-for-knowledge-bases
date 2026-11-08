@@ -1,0 +1,10 @@
+{
+  "removalPolicy": "RETAIN",
+  "allowedTenantAccountIds": [],
+  "apiThrottling": { "rateLimit": 100, "burstLimit": 200 },
+  "deletionProtectionThreshold": 15,
+  "logRetentionDays": 30,
+  "costCenter": "unassigned",
+  "jobCompute": { "maxVcpus": 256, "natGateways": 1 },
+  "alarms": { "apiLatencyMs": 5000, "apiServerErrorPercent": 5 }
+}

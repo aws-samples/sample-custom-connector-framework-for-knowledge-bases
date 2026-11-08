@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "GitHubAccessConfiguration": {
+      "additionalProperties": false,
+      "description": "How the connector paces and retries its GitHub requests.",
+      "properties": {
+        "max_rate_limit_wait_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Max Rate Limit Wait Seconds",
+          "type": "number"
+        },
+        "request_interval_seconds": {
+          "minimum": 0,
+          "title": "Request Interval Seconds",
+          "type": "number"
+        },
+        "request_timeout_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Request Timeout Seconds",
+          "type": "integer"
+        },
+        "retry_attempts": {
+          "minimum": 0,
+          "title": "Retry Attempts",
+          "type": "integer"
+        },
+        "retry_backoff_seconds": {
+          "minimum": 0,
+          "title": "Retry Backoff Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "request_interval_seconds",
+        "request_timeout_seconds",
+        "retry_attempts",
+        "retry_backoff_seconds",
+        "max_rate_limit_wait_seconds"
+      ],
+      "title": "GitHubAccessConfiguration",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Which repositories one owner contributes, which of their files, and how often every repository is read.",
+  "properties": {
+    "excluded_path_patterns": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Excluded Path Patterns",
+      "type": "array"
+    },
+    "excluded_repository_patterns": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Excluded Repository Patterns",
+      "type": "array"
+    },
+    "full_read_interval_days": {
+      "exclusiveMinimum": 0,
+      "title": "Full Read Interval Days",
+      "type": "integer"
+    },
+    "github": {
+      "$ref": "#/$defs/GitHubAccessConfiguration"
+    },
+    "max_file_bytes": {
+      "exclusiveMinimum": 0,
+      "title": "Max File Bytes",
+      "type": "integer"
+    },
+    "max_repositories": {
+      "exclusiveMinimum": 0,
+      "title": "Max Repositories",
+      "type": "integer"
+    },
+    "max_repository_age_days": {
+      "exclusiveMinimum": 0,
+      "title": "Max Repository Age Days",
+      "type": "integer"
+    },
+    "owner": {
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "title": "Owner",
+      "type": "string"
+    },
+    "repositories": {
+      "items": {
+        "pattern": "^[A-Za-z0-9._-]{1,100}$",
+        "type": "string"
+      },
+      "title": "Repositories",
+      "type": "array"
+    }
+  },
+  "required": [
+    "owner",
+    "repositories",
+    "max_repositories",
+    "max_repository_age_days",
+    "excluded_repository_patterns",
+    "excluded_path_patterns",
+    "max_file_bytes",
+    "full_read_interval_days",
+    "github"
+  ],
+  "title": "GitHubConnectorConfiguration",
+  "type": "object"
+}

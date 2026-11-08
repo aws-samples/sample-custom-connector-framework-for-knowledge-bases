@@ -1,0 +1,23 @@
+{
+  "containers": {
+    "connector": "connector",
+    "logRouter": "log-router"
+  },
+  "variables": {
+    "apiEndpoint": "CUSTOM_CONNECTOR_FRAMEWORK_API_ENDPOINT",
+    "region": "AWS_REGION",
+    "tenantArnPrefix": "CUSTOM_CONNECTOR_FRAMEWORK_TENANT_ARN_PREFIX",
+    "destinationId": "CUSTOM_CONNECTOR_FRAMEWORK_DESTINATION_ID",
+    "connectorId": "CUSTOM_CONNECTOR_FRAMEWORK_CUSTOM_CONNECTOR_ID",
+    "jobId": "CUSTOM_CONNECTOR_FRAMEWORK_JOB_ID"
+  },
+  "exitCodes": {
+    "SUCCEEDED": 0,
+    "CONNECTOR_IMPLEMENTATION_ERROR": 70,
+    "JOB_TERMINATED": 71,
+    "SOURCE_ACCESS_DENIED": 72,
+    "SOURCE_ACCESS_FAILED": 73,
+    "SECRET_UNAVAILABLE": 74,
+    "FRAMEWORK_API_UNAVAILABLE": 76
+  }
+}

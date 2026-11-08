@@ -1,0 +1,12 @@
+node_modules/
+cdk.out/
+cdk.out.*/
+coverage/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.d.ts
+*.js
+!jest.config.js
+!eslint.config.mjs

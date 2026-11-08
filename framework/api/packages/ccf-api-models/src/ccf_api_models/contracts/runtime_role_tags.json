@@ -1,0 +1,7 @@
+{
+  "destinationId": "ccf:destination-id",
+  "connectorId": "ccf:connector-id",
+  "tenantAccount": "ccf:tenant-account",
+  "sourceAccessRole": "ccf:source-access-role",
+  "logDeliveryRole": "ccf:log-delivery-role"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "custom-connector-framework-build-workspace",
+  "private": true,
+  "description": "Build tooling only: one npm workspace and one lockfile for the two CDK apps (framework/cdk and connectors/github/cdk), so they share one copy of aws-cdk-lib and the GitHub connector app can import the framework's constructs. Each app still has its own cdk.json and deploys on its own.",
+  "engines": {
+    "node": "^22 || ^24"
+  },
+  "workspaces": [
+    "framework/cdk",
+    "connectors/github/cdk"
+  ],
+  "overrides": {
+    "glob": "14.0.4",
+    "minimatch": "11.0.5"
+  }
+}

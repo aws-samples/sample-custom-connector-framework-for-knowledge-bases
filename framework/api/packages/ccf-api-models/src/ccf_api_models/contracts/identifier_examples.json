@@ -1,0 +1,24 @@
+{
+  "tenants": [
+    { "partition": "aws", "region": "us-east-1", "accountId": "111122223333", "arnPrefix": "arn:aws:ccf:us-east-1:111122223333" },
+    { "partition": "aws-us-gov", "region": "us-gov-west-1", "accountId": "111122223333", "arnPrefix": "arn:aws-us-gov:ccf:us-gov-west-1:111122223333" },
+    { "partition": "aws-cn", "region": "cn-north-1", "accountId": "111122223333", "arnPrefix": "arn:aws-cn:ccf:cn-north-1:111122223333" },
+    { "partition": "aws-eusc", "region": "eusc-de-east-1", "accountId": "111122223333", "arnPrefix": "arn:aws-eusc:ccf:eusc-de-east-1:111122223333" }
+  ],
+  "destinationId": "dst-7c41e9a2b5d0",
+  "destinationArn": "arn:aws:ccf:us-east-1:111122223333:destination/dst-7c41e9a2b5d0",
+  "connectorId": "cc-e020d65d76c0",
+  "connectorArn": "arn:aws:ccf:us-east-1:111122223333:destination/dst-7c41e9a2b5d0/custom-connector/cc-e020d65d76c0",
+  "destinationConnectorKey": "dst-7c41e9a2b5d0#cc-e020d65d76c0",
+  "connectorKeyPrefix": "connector_id=cc-e020d65d76c0/",
+  "jobId": "ccj-0fdef5d64630",
+  "jobArn": "arn:aws:ccf:us-east-1:111122223333:destination/dst-7c41e9a2b5d0/custom-connector/cc-e020d65d76c0/job/ccj-0fdef5d64630",
+  "sourceCollectionId": "630587223",
+  "collectionId": "col-dec683794d44413f",
+  "sourceDocumentId": "630587223/README.md",
+  "documentId": "doc-be49ed8650bb1e19",
+  "documentArn": "arn:aws:ccf:us-east-1:111122223333:destination/dst-7c41e9a2b5d0/custom-connector/cc-e020d65d76c0/collection/col-dec683794d44413f/document/doc-be49ed8650bb1e19",
+  "documentPrefix": "connector_id=cc-e020d65d76c0/collection_id=col-dec683794d44413f/document_id=doc-be49ed8650bb1e19/",
+  "documentObjectKey": "connector_id=cc-e020d65d76c0/collection_id=col-dec683794d44413f/document_id=doc-be49ed8650bb1e19/README.md",
+  "keyOutsideTheLayout": "connector_id=cc-e020d65d76c0/README.md"
+}

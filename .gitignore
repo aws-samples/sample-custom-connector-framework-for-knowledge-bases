@@ -23,7 +23,6 @@ __pycache__/
 venv/
 ENV/
 env/
-.env
 .pytest_cache/
 .ruff_cache/
 .coverage
@@ -43,7 +42,6 @@ pip-delete-this-directory.txt
 cdk.out/
 cdk.out.*/
 cdk-outputs.json
-cdk.context.json
 **/cdk.context.json
 
 # Environment variables and secrets
@@ -96,10 +94,4 @@ temp/
 # Local development
 .localstack/
 
-# Custom Connector Framework generated artifacts
-**/model/*.json
-*-service-model.json
-*-oas30.json
-CustomConnectorFramework-prod-oas30.json
-ccf-service-model.json
 .kiro

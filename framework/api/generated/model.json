@@ -1,0 +1,4706 @@
+{
+    "smithy": "2.0",
+    "metadata": {
+        "suppressions": [
+            {
+                "id": "MemberShouldReferenceResource",
+                "namespace": "ccf",
+                "reason": "Identifier members name their own resource, not the child resources that share the identifier."
+            }
+        ]
+    },
+    "shapes": {
+        "aws.api#ArnNamespace": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A string representing a service's ARN namespace.",
+                "smithy.api#pattern": "^[a-z0-9.\\-]{1,63}$",
+                "smithy.api#private": {}
+            }
+        },
+        "aws.api#CloudFormationName": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A string representing a CloudFormation service name.",
+                "smithy.api#pattern": "^[A-Z][A-Za-z0-9]+$",
+                "smithy.api#private": {}
+            }
+        },
+        "aws.api#CloudWatchMetricNamespace": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 255
+                },
+                "smithy.api#pattern": "^[^:].*$",
+                "smithy.api#private": {}
+            }
+        },
+        "aws.api#ResourceDelimiter": {
+            "type": "enum",
+            "members": {
+                "FORWARD_SLASH": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "The `/` character.",
+                        "smithy.api#enumValue": "/"
+                    }
+                },
+                "COLON": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "The `:` character.",
+                        "smithy.api#enumValue": ":"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "The possible delimiters for an ARN resource segment.",
+                "smithy.api#private": {}
+            }
+        },
+        "aws.api#ServiceTagOperationReference": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Points to a service-bound operation designated for a service-wide tagging API.",
+                "smithy.api#idRef": {
+                    "failWhenMissing": true,
+                    "selector": "service > operation"
+                }
+            }
+        },
+        "aws.api#TagOperationReference": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Points to an operation designated for a tagging APi",
+                "smithy.api#idRef": {
+                    "failWhenMissing": true,
+                    "selector": "resource > operation"
+                }
+            }
+        },
+        "aws.api#TaggableApiConfig": {
+            "type": "structure",
+            "members": {
+                "tagApi": {
+                    "target": "aws.api#TagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The `tagApi` property is a string value that references a non-instance\nor create operation that creates or updates tags on the resource.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "untagApi": {
+                    "target": "aws.api#TagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The `untagApi` property is a string value that references a non-instance\noperation that removes tags on the resource.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "listTagsApi": {
+                    "target": "aws.api#TagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The `listTagsApi` property is a string value that references a non-\ninstance operation which gets the current tags on the resource.",
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Structure representing the configuration of resource specific tagging APIs"
+            }
+        },
+        "aws.api#TaggableServiceApiConfig": {
+            "type": "structure",
+            "members": {
+                "tagApi": {
+                    "target": "aws.api#ServiceTagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The operation that creates or updates tags on resources for this service."
+                    }
+                },
+                "untagApi": {
+                    "target": "aws.api#ServiceTagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The operation that removes tags from resources for this service."
+                    }
+                },
+                "listTagsApi": {
+                    "target": "aws.api#ServiceTagOperationReference",
+                    "traits": {
+                        "smithy.api#documentation": "The operation that lists tags on resources for this service."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Structure representing the configuration of service-wide tagging APIs when\nnon-default operation names are used. All members are optional; an unset\nmember implies the default-named operation (TagResource, UntagResource,\nListTagsForResource respectively) is used."
+            }
+        },
+        "aws.api#arn": {
+            "type": "structure",
+            "members": {
+                "template": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "Defines the ARN template. The provided string contains URI-template\nstyle label placeholders that contain the name of one of the identifiers\ndefined in the `identifiers` property of the resource. These labels can\nbe substituted at runtime with the actual identifiers of the resource.\nEvery identifier name of the resource MUST have corresponding label of\nthe same name. Note that percent-encoding **is not** performed on these\nplaceholder values; they are to be replaced literally. For relative ARN\ntemplates that have not set `absolute` to `true`, the template string\ncontains only the resource part of the ARN (for example,\n`foo/{MyResourceId}`). Relative ARNs MUST NOT start with \"/\".",
+                        "smithy.api#required": {}
+                    }
+                },
+                "absolute": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Set to true to indicate that the ARN template contains a fully-formed\nARN that does not need to be merged with the service. This type of ARN\nMUST be used when the identifier of a resource is an ARN or is based on\nthe ARN identifier of a parent resource."
+                    }
+                },
+                "noRegion": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Set to true to specify that the ARN does not contain a region. If not\nset, or if set to false, the resolved ARN will contain a placeholder\nfor the region. This can only be set to true if `absolute` is not set\nor is false."
+                    }
+                },
+                "noAccount": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Set to true to specify that the ARN does not contain an account ID. If\nnot set, or if set to false, the resolved ARN will contain a placeholder\nfor the customer account ID. This can only be set to true if absolute\nis not set or is false."
+                    }
+                },
+                "resourceDelimiter": {
+                    "target": "aws.api#ResourceDelimiter",
+                    "traits": {
+                        "smithy.api#documentation": "Defines which character is used to delimit sections of the resource\nsegment of an ARN. This can only be set if absolute is set to true."
+                    }
+                },
+                "reusable": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Set to true to indicate that an ARN may be reused for different\ninstances of a resource."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Specifies an ARN template for the resource.",
+                "smithy.api#externalDocumentation": {
+                    "Reference": "https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html"
+                },
+                "smithy.api#trait": {
+                    "selector": "resource"
+                }
+            }
+        },
+        "aws.api#arnReference": {
+            "type": "structure",
+            "members": {
+                "type": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The AWS CloudFormation resource type contained in the ARN."
+                    }
+                },
+                "resource": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "An absolute shape ID that references the Smithy resource type contained\nin the ARN (e.g., `com.foo#SomeResource`). The targeted resource is not\nrequired to be found in the model, allowing for external shapes to be\nreferenced without needing to take on an additional dependency. If the\nshape is found in the model, it MUST target a resource shape, and the\nresource MUST be found within the closure of the referenced service\nshape."
+                    }
+                },
+                "service": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The Smithy service absolute shape ID that is referenced by the ARN. The\ntargeted service is not required to be found in the model, allowing for\nexternal shapes to be referenced without needing to take on an\nadditional dependency."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Marks a string as containing an ARN.",
+                "smithy.api#trait": {
+                    "selector": "string"
+                }
+            }
+        },
+        "aws.api#awsChunked": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Indicates that the streaming blob supports aws-chunked content encoding.\n\nWhen present, SDKs MUST aws-chunk encode the underlying data stream.\naws-chunked encoding is a series of data blocks followed by a final block\nthat contains metadata about the content transferred (e.g., checksums).",
+                "smithy.api#trait": {
+                    "selector": "blob[trait|streaming]",
+                    "breakingChanges": [
+                        {
+                            "change": "remove"
+                        }
+                    ]
+                }
+            }
+        },
+        "aws.api#clientDiscoveredEndpoint": {
+            "type": "structure",
+            "members": {
+                "required": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "This field denotes whether or not this operation requires the use of a\nspecific endpoint. If this field is false, the standard regional\nendpoint for a service can handle this request. The client will start\nsending requests to the standard regional endpoint while working to\ndiscover a more specific endpoint.",
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Indicates that the target operation should use the client's endpoint\ndiscovery logic.",
+                "smithy.api#trait": {
+                    "selector": "operation"
+                }
+            }
+        },
+        "aws.api#clientEndpointDiscovery": {
+            "type": "structure",
+            "members": {
+                "operation": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "Indicates the operation that clients should use to discover endpoints\nfor the service.",
+                        "smithy.api#idRef": {
+                            "failWhenMissing": true,
+                            "selector": "operation"
+                        },
+                        "smithy.api#required": {}
+                    }
+                },
+                "error": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "Indicates the error that tells clients that the endpoint they are using\nis no longer valid. This error MUST be bound to any operation bound to\nthe service which is marked with the aws.api#clientDiscoveredEndpoint\ntrait.",
+                        "smithy.api#idRef": {
+                            "failWhenMissing": true,
+                            "selector": "structure[trait|error]"
+                        },
+                        "smithy.api#recommended": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Configures endpoint discovery for the service.",
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.api#clientEndpointDiscoveryId": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Indicates members of the operation input which should be use to discover\nendpoints.",
+                "smithy.api#trait": {
+                    "selector": "operation[trait|aws.api#clientDiscoveredEndpoint] -[input]->\nstructure > :test(member[trait|required] > string)"
+                }
+            }
+        },
+        "aws.api#controlPlane": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Defines a service, resource, or operation as operating on the control plane.",
+                "smithy.api#trait": {
+                    "selector": ":test(service, resource, operation)",
+                    "conflicts": [
+                        "aws.api#dataPlane"
+                    ]
+                }
+            }
+        },
+        "aws.api#data": {
+            "type": "enum",
+            "members": {
+                "CUSTOMER_CONTENT": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "Customer content means any software (including machine images), data,\ntext, audio, video or images that customers or any customer end user\ntransfers to AWS for processing, storage or hosting by AWS services in\nconnection with the customer’s accounts and any computational results\nthat customers or any customer end user derive from the foregoing\nthrough their use of AWS services.",
+                        "smithy.api#enumValue": "content"
+                    }
+                },
+                "CUSTOMER_ACCOUNT_INFORMATION": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "Account information means information about customers that customers\nprovide to AWS in connection with the creation or administration of\ncustomers’ accounts.",
+                        "smithy.api#enumValue": "account"
+                    }
+                },
+                "SERVICE_ATTRIBUTES": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "Service Attributes means service usage data related to a customer’s\naccount, such as resource identifiers, metadata tags, security and\naccess roles, rules, usage policies, permissions, usage statistics,\nlogging data, and analytics.",
+                        "smithy.api#enumValue": "usage"
+                    }
+                },
+                "TAG_DATA": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "Designates metadata tags applied to AWS resources.",
+                        "smithy.api#enumValue": "tagging"
+                    }
+                },
+                "PERMISSIONS_DATA": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "Designates security and access roles, rules, usage policies, and\npermissions.",
+                        "smithy.api#enumValue": "permissions"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Designates the target as containing data of a known classification level.",
+                "smithy.api#trait": {
+                    "selector": ":test(simpleType, list, structure, union, member)"
+                }
+            }
+        },
+        "aws.api#dataPlane": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Defines a service, resource, or operation as operating on the data plane.",
+                "smithy.api#trait": {
+                    "selector": ":test(service, resource, operation)",
+                    "conflicts": [
+                        "aws.api#controlPlane"
+                    ]
+                }
+            }
+        },
+        "aws.api#service": {
+            "type": "structure",
+            "members": {
+                "sdkId": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The `sdkId` property is a required string value that specifies the AWS\nSDK service ID (e.g., \"API Gateway\"). This value is used for generating\nclient names in SDKs and for linking between services.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "arnNamespace": {
+                    "target": "aws.api#ArnNamespace",
+                    "traits": {
+                        "smithy.api#documentation": "The `arnNamespace` property is a string value that defines the ARN service\nnamespace of the service (e.g., \"apigateway\"). This value is used in\nARNs assigned to resources in the service. If not set, this value\ndefaults to the lowercase name of the service shape."
+                    }
+                },
+                "cloudFormationName": {
+                    "target": "aws.api#CloudFormationName",
+                    "traits": {
+                        "smithy.api#documentation": "The `cloudFormationName` property is a string value that specifies the\nAWS CloudFormation service name (e.g., `ApiGateway`). When not set,\nthis value defaults to the name of the service shape. This value is\npart of the CloudFormation resource type name that is automatically\nassigned to resources in the service (e.g., `AWS::<NAME>::resourceName`)."
+                    }
+                },
+                "cloudTrailEventSource": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The `cloudTrailEventSource` property is a string value that defines the\nAWS customer-facing eventSource property contained in CloudTrail event\nrecords emitted by the service. If not specified, this value defaults\nto the `arnNamespace` plus `.amazonaws.com`."
+                    }
+                },
+                "docId": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The `docId` property is a string value that defines the identifier\nused to implement linking between service and SDK documentation for\nAWS services. If not specified, this value defaults to the `sdkId` in\nlower case plus the service `version` property, separated by dashes."
+                    }
+                },
+                "endpointPrefix": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The `endpointPrefix` property is a string value that identifies which\nendpoint in a given region should be used to connect to the service.\nFor example, most services in the AWS standard partition have endpoints\nwhich follow the format: `{endpointPrefix}.{region}.amazonaws.com`. A\nservice with the endpoint prefix example in the region us-west-2 might\nhave the endpoint example.us-west-2.amazonaws.com.\n\nThis value is not unique across services and is subject to change.\nTherefore, it MUST NOT be used for client naming or for any other\npurpose that requires a static, unique identifier. sdkId should be used\nfor those purposes. Additionally, this value can be used to attempt to\nresolve endpoints."
+                    }
+                },
+                "cloudWatchNamespace": {
+                    "target": "aws.api#CloudWatchMetricNamespace",
+                    "traits": {
+                        "smithy.api#documentation": "The `cloudWatchNamespace` property is a string value that defines the\nAWS customer-facing namespace of most metrics emitted by the service."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "An AWS service is defined using the `aws.api#service` trait. This trait\nprovides information about the service like the name used to generate AWS\nSDK client classes and the namespace used in ARNs.",
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.api#tagEnabled": {
+            "type": "structure",
+            "members": {
+                "disableDefaultOperations": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "The `disableDefaultOperations` property is a boolean value that specifies\nif the service does not have the standard tag operations supporting all\nresources on the service. Default value is `false`"
+                    }
+                },
+                "apiConfig": {
+                    "target": "aws.api#TaggableServiceApiConfig",
+                    "traits": {
+                        "smithy.api#documentation": "Specifies non-default operation names for the service-wide tagging APIs.\nAny unset member falls back to the default-named operation\n(TagResource, UntagResource, ListTagsForResource respectively)."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Annotates a service as having tagging on 1 or more resources and associated\nAPIs to perform CRUD operations on those tags",
+                "smithy.api#trait": {
+                    "selector": "service"
+                },
+                "smithy.api#unstable": {}
+            }
+        },
+        "aws.api#taggable": {
+            "type": "structure",
+            "members": {
+                "property": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The `property` property is a string value that identifies which\nresource property represents tags for the resource."
+                    }
+                },
+                "apiConfig": {
+                    "target": "aws.api#TaggableApiConfig",
+                    "traits": {
+                        "smithy.api#documentation": "Specifies configuration for resource specific tagging APIs if the\nresource has them."
+                    }
+                },
+                "disableSystemTags": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Flag indicating if the resource is not able to carry AWS system level.\nUsed by service principals. Default value is `false`"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Indicates a resource supports CRUD operations for tags. Either through\nresource lifecycle or instance operations or tagging operations on the\nservice.",
+                "smithy.api#trait": {
+                    "selector": "resource"
+                },
+                "smithy.api#unstable": {}
+            }
+        },
+        "aws.auth#StringList": {
+            "type": "list",
+            "member": {
+                "target": "smithy.api#String"
+            },
+            "traits": {
+                "smithy.api#private": {}
+            }
+        },
+        "aws.auth#cognitoUserPools": {
+            "type": "structure",
+            "members": {
+                "providerArns": {
+                    "target": "aws.auth#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "A list of the Amazon Cognito user pool ARNs. Each element is of this\nformat: `arn:aws:cognito-idp:{region}:{account_id}:userpool/{user_pool_id}`.",
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#authDefinition": {},
+                "smithy.api#documentation": "Configures an Amazon Cognito User Pools auth scheme.",
+                "smithy.api#internal": {},
+                "smithy.api#tags": [
+                    "internal"
+                ],
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.auth#cognitoUserPoolsScopes": {
+            "type": "list",
+            "member": {
+                "target": "smithy.api#String"
+            },
+            "traits": {
+                "smithy.api#documentation": "Defines the OAuth scopes required to invoke an operation that uses an\nAmazon Cognito User Pools authorizer.",
+                "smithy.api#internal": {},
+                "smithy.api#length": {
+                    "min": 1
+                },
+                "smithy.api#tags": [
+                    "internal"
+                ],
+                "smithy.api#trait": {
+                    "selector": "service[trait|aws.auth#cognitoUserPools] ~> operation"
+                }
+            }
+        },
+        "aws.auth#sigv4": {
+            "type": "structure",
+            "members": {
+                "name": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The signature version 4 service signing name to use in the credential\nscope when signing requests. This value SHOULD match the `arnNamespace`\nproperty of the `aws.api#service` trait if present and the `name`\nproperty of the `aws.api#sigv4a` trait if present.",
+                        "smithy.api#externalDocumentation": {
+                            "Reference": "https://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html"
+                        },
+                        "smithy.api#length": {
+                            "min": 1
+                        },
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#authDefinition": {
+                    "traits": [
+                        "aws.auth#unsignedPayload"
+                    ]
+                },
+                "smithy.api#documentation": "[Signature Version 4](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html)\nis the process to add authentication information to AWS requests sent by HTTP. For\nsecurity, most requests to AWS must be signed with an access key, which consists\nof an access key ID and secret access key. These two keys are commonly referred to\nas your security credentials.",
+                "smithy.api#externalDocumentation": {
+                    "Reference": "https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html"
+                },
+                "smithy.api#trait": {
+                    "selector": "service",
+                    "breakingChanges": [
+                        {
+                            "change": "remove",
+                            "message": "Removing the existing authentication scheme is not backward compatible and can break existing clients' authentication."
+                        }
+                    ]
+                }
+            }
+        },
+        "aws.auth#sigv4a": {
+            "type": "structure",
+            "members": {
+                "name": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The signature version 4a service signing name to use in the credential\nscope when signing requests. This value SHOULD match the `arnNamespace`\nproperty of the `aws.api#service` trait if present and the `name`\nproperty of the `aws.api#sigv4` trait.",
+                        "smithy.api#externalDocumentation": {
+                            "Reference": "https://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html"
+                        },
+                        "smithy.api#length": {
+                            "min": 1
+                        },
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#authDefinition": {
+                    "traits": [
+                        "aws.auth#unsignedPayload"
+                    ]
+                },
+                "smithy.api#documentation": "Signature Version 4 Asymmetric (SigV4A), an extension of Signature Version 4 (SigV4), is the\nprocess to add authentication information to AWS requests sent by HTTP. SigV4A is nearly\nidentical to SigV4, but also uses public-private keys and asymmetric cryptographic signatures\nfor every request. Most notably, SigV4A supports signatures for multi-region API requests.",
+                "smithy.api#externalDocumentation": {
+                    "Reference": "https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html",
+                    "Examples": "https://github.com/aws-samples/sigv4a-signing-examples"
+                },
+                "smithy.api#trait": {
+                    "selector": "service[trait|aws.auth#sigv4]",
+                    "breakingChanges": [
+                        {
+                            "change": "remove",
+                            "message": "Removing the existing authentication scheme is not backward compatible and can break existing clients' authentication."
+                        }
+                    ]
+                }
+            }
+        },
+        "aws.auth#unsignedPayload": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Indicates that the request payload of a signed request is not to be used\nas part of the signature.",
+                "smithy.api#trait": {
+                    "selector": "operation"
+                }
+            }
+        },
+        "aws.customizations#s3UnwrappedXmlOutput": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Indicates the response body from S3 is not wrapped in the\naws-restxml-protocol operation-level XML node. Intended to only be used by\nAWS S3.",
+                "smithy.api#trait": {
+                    "selector": "operation"
+                }
+            }
+        },
+        "aws.protocols#ChecksumAlgorithm": {
+            "type": "enum",
+            "members": {
+                "CRC32": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "CRC32",
+                        "smithy.api#enumValue": "CRC32"
+                    }
+                },
+                "CRC32C": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "CRC32C",
+                        "smithy.api#enumValue": "CRC32C"
+                    }
+                },
+                "CRC64NVME": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "CRC64NVME",
+                        "smithy.api#enumValue": "CRC64NVME"
+                    }
+                },
+                "MD5": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "MD5",
+                        "smithy.api#enumValue": "MD5"
+                    }
+                },
+                "SHA1": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "SHA1",
+                        "smithy.api#enumValue": "SHA1"
+                    }
+                },
+                "SHA256": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "SHA256",
+                        "smithy.api#enumValue": "SHA256"
+                    }
+                },
+                "SHA512": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "SHA512",
+                        "smithy.api#enumValue": "SHA512"
+                    }
+                },
+                "XXHASH64": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "XXHASH64",
+                        "smithy.api#enumValue": "XXHASH64"
+                    }
+                },
+                "XXHASH3": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "XXHASH3",
+                        "smithy.api#enumValue": "XXHASH3"
+                    }
+                },
+                "XXHASH128": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#documentation": "XXHASH128",
+                        "smithy.api#enumValue": "XXHASH128"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#private": {}
+            }
+        },
+        "aws.protocols#ChecksumAlgorithmSet": {
+            "type": "list",
+            "member": {
+                "target": "aws.protocols#ChecksumAlgorithm"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1
+                },
+                "smithy.api#private": {},
+                "smithy.api#uniqueItems": {}
+            }
+        },
+        "aws.protocols#HttpConfiguration": {
+            "type": "structure",
+            "members": {
+                "http": {
+                    "target": "aws.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "The priority ordered list of supported HTTP protocol versions."
+                    }
+                },
+                "eventStreamHttp": {
+                    "target": "aws.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "The priority ordered list of supported HTTP protocol versions that\nare required when using event streams with the service. If not set,\nthis value defaults to the value of the `http` member. Any entry in\n`eventStreamHttp` MUST also appear in `http`."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Contains HTTP protocol configuration for HTTP-based protocols.",
+                "smithy.api#mixin": {
+                    "localTraits": [
+                        "smithy.api#private"
+                    ]
+                },
+                "smithy.api#private": {}
+            }
+        },
+        "aws.protocols#StringList": {
+            "type": "list",
+            "member": {
+                "target": "smithy.api#String"
+            },
+            "traits": {
+                "smithy.api#private": {}
+            }
+        },
+        "aws.protocols#awsJson1_0": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "aws.protocols#HttpConfiguration"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "An RPC-based protocol that sends JSON payloads. This protocol does not use\nHTTP binding traits.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.protocols#awsJson1_1": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "aws.protocols#HttpConfiguration"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "An RPC-based protocol that sends JSON payloads. This protocol does not use\nHTTP binding traits.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.protocols#awsQuery": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#deprecated": {},
+                "smithy.api#documentation": "An RPC-based protocol that sends 'POST' requests in the body as\n`x-www-form-urlencoded` strings and responses in XML documents. This\nprotocol does not use HTTP binding traits.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "aws.protocols#awsQueryError",
+                        "smithy.api#xmlAttribute",
+                        "smithy.api#xmlFlattened",
+                        "smithy.api#xmlName",
+                        "smithy.api#xmlNamespace"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service [trait|xmlNamespace]"
+                },
+                "smithy.api#traitValidators": {
+                    "UnsupportedProtocolDocument": {
+                        "selector": "~> member :test(> document)",
+                        "message": "Document types are not supported with awsQuery"
+                    }
+                }
+            }
+        },
+        "aws.protocols#awsQueryCompatible": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "Enable backward compatibility when migrating from awsQuery to the awsJson\nprotocol or Smithy RPC v2 CBOR.",
+                "smithy.api#trait": {
+                    "selector": "service :test([trait|aws.protocols#awsJson1_0],\n              [trait|smithy.protocols#rpcv2Cbor],\n              [trait|smithy.protocols#rpcv2Json])"
+                }
+            }
+        },
+        "aws.protocols#awsQueryError": {
+            "type": "structure",
+            "members": {
+                "code": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "The value used to distinguish this error shape during serialization.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "httpResponseCode": {
+                    "target": "smithy.api#Integer",
+                    "traits": {
+                        "smithy.api#documentation": "The HTTP response code used on a response containing this error shape.",
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Provides the value in the 'Code' distinguishing field and HTTP response\ncode for an operation error.",
+                "smithy.api#trait": {
+                    "selector": "structure [trait|error]",
+                    "breakingChanges": [
+                        {
+                            "change": "any"
+                        }
+                    ]
+                }
+            }
+        },
+        "aws.protocols#ec2Query": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#deprecated": {},
+                "smithy.api#documentation": "An RPC-based protocol that sends 'POST' requests in the body as Amazon EC2\nformatted `x-www-form-urlencoded` strings and responses in XML documents.\nThis protocol does not use HTTP binding traits.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "aws.protocols#ec2QueryName",
+                        "smithy.api#xmlAttribute",
+                        "smithy.api#xmlFlattened",
+                        "smithy.api#xmlName",
+                        "smithy.api#xmlNamespace"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service [trait|xmlNamespace]"
+                },
+                "smithy.api#traitValidators": {
+                    "UnsupportedProtocolDocument": {
+                        "selector": "~> member :test(> document)",
+                        "message": "Document types are not supported with ec2Query"
+                    }
+                }
+            }
+        },
+        "aws.protocols#ec2QueryName": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Indicates the serialized name of a structure member when that structure is\nserialized for the input of an EC2 operation.",
+                "smithy.api#pattern": "^[a-zA-Z_][a-zA-Z_0-9-]*$",
+                "smithy.api#trait": {
+                    "selector": "structure > member"
+                }
+            }
+        },
+        "aws.protocols#httpChecksum": {
+            "type": "structure",
+            "members": {
+                "requestAlgorithmMember": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "Defines a top-level operation input member that is used to configure\nrequest checksum behavior."
+                    }
+                },
+                "requestChecksumRequired": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#documentation": "Indicates an operation requires a checksum in its HTTP request."
+                    }
+                },
+                "requestValidationModeMember": {
+                    "target": "smithy.api#String",
+                    "traits": {
+                        "smithy.api#documentation": "Defines a top-level operation input member used to opt-in to response\nchecksum validation."
+                    }
+                },
+                "responseAlgorithms": {
+                    "target": "aws.protocols#ChecksumAlgorithmSet",
+                    "traits": {
+                        "smithy.api#documentation": "Defines the checksum algorithms clients should look for when performing\nHTTP response checksum validation."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Indicates that an operation supports checksum validation.",
+                "smithy.api#trait": {
+                    "selector": "operation",
+                    "breakingChanges": [
+                        {
+                            "change": "remove",
+                            "severity": "DANGER",
+                            "message": "Removing the trait removes the ability for clients to do request or response checksums. The service MUST continue to support old clients by supporting the `httpChecksum` trait."
+                        },
+                        {
+                            "change": "remove",
+                            "path": "/requestAlgorithmMember",
+                            "severity": "DANGER",
+                            "message": "`requestAlgorithmMember` was removed, so newly generated clients will no longer be able to pick the request checksum algorithms The service MUST continue to support old clients by supporting `requestAlgorithmMember`."
+                        },
+                        {
+                            "change": "remove",
+                            "path": "/requestValidationModeMember",
+                            "severity": "DANGER",
+                            "message": "`requestValidationModeMember` was removed, so newly generated clients will no longer validate response checksums. The service MUST continue to support old clients by supporting `requestValidationModeMember`."
+                        },
+                        {
+                            "change": "remove",
+                            "path": "/responseAlgorithms/member",
+                            "severity": "DANGER",
+                            "message": "Members of `responseAlgorithms` were removed, so newly generated clients will no longer validate response checksums for the removed algorithms. The service MUST continue to support old clients by supporting removed compression algorithms."
+                        }
+                    ]
+                },
+                "smithy.api#unstable": {}
+            }
+        },
+        "aws.protocols#restJson1": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "aws.protocols#HttpConfiguration"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "A RESTful protocol that sends JSON in structured payloads.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "smithy.api#http",
+                        "smithy.api#httpError",
+                        "smithy.api#httpHeader",
+                        "smithy.api#httpLabel",
+                        "smithy.api#httpPayload",
+                        "smithy.api#httpPrefixHeaders",
+                        "smithy.api#httpQuery",
+                        "smithy.api#httpQueryParams",
+                        "smithy.api#httpResponseCode",
+                        "aws.protocols#httpChecksum",
+                        "smithy.api#httpChecksumRequired",
+                        "smithy.api#jsonName"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        },
+        "aws.protocols#restXml": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "aws.protocols#HttpConfiguration"
+                }
+            ],
+            "members": {
+                "noErrorWrapping": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#deprecated": {},
+                        "smithy.api#documentation": "Disables the serialization wrapping of error properties in an 'Error'\nXML element."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#deprecated": {},
+                "smithy.api#documentation": "A RESTful protocol that sends XML in structured payloads.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#timestampFormat",
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "smithy.api#http",
+                        "smithy.api#httpError",
+                        "smithy.api#httpHeader",
+                        "smithy.api#httpLabel",
+                        "smithy.api#httpPayload",
+                        "smithy.api#httpPrefixHeaders",
+                        "smithy.api#httpQuery",
+                        "smithy.api#httpQueryParams",
+                        "smithy.api#httpResponseCode",
+                        "aws.protocols#httpChecksum",
+                        "smithy.api#httpChecksumRequired",
+                        "smithy.api#xmlAttribute",
+                        "smithy.api#xmlFlattened",
+                        "smithy.api#xmlName",
+                        "smithy.api#xmlNamespace"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                },
+                "smithy.api#traitValidators": {
+                    "UnsupportedProtocolDocument": {
+                        "selector": "~> member :test(> document)",
+                        "message": "Document types are not supported with restXml"
+                    }
+                }
+            }
+        },
+        "ccf#Arn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:[A-Za-z0-9-]+:[A-Za-z0-9-]+:[A-Za-z0-9-]*:[A-Za-z0-9-]*:.+$"
+            }
+        },
+        "ccf#BadRequestException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#error": "client",
+                "smithy.api#httpError": 400
+            }
+        },
+        "ccf#BatchDeleteCustomConnectorCollections": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#BatchDeleteCustomConnectorCollectionsRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "RUNTIME"
+                ],
+                "smithy.api#documentation": "Delete up to 100 collections that hold no documents, all or none. Unknown\ncollection IDs are ignored.",
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/collections/batch-delete",
+                    "code": 204
+                },
+                "smithy.api#idempotent": {},
+                "smithy.api#suppress": [
+                    "HttpMethodSemantics.UnnecessaryIdempotentTrait"
+                ]
+            }
+        },
+        "ccf#BatchDeleteCustomConnectorCollectionsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collections": {
+                    "target": "ccf#CollectionReferenceList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#BatchDeleteCustomConnectorDocuments": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#BatchDeleteCustomConnectorDocumentsRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "RUNTIME"
+                ],
+                "smithy.api#documentation": "Delete the files and records of up to 99 documents. Unknown document IDs are\nignored, so a retry succeeds.",
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/documents/batch-delete",
+                    "code": 204
+                },
+                "smithy.api#idempotent": {},
+                "smithy.api#suppress": [
+                    "HttpMethodSemantics.UnnecessaryIdempotentTrait"
+                ]
+            }
+        },
+        "ccf#BatchDeleteCustomConnectorDocumentsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#default": "col-default"
+                    }
+                },
+                "document_ids": {
+                    "target": "ccf#DocumentIdList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#BatchPutCustomConnectorDocuments": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#BatchPutCustomConnectorDocumentsRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "RUNTIME"
+                ],
+                "smithy.api#documentation": "Record up to 99 documents whose files the caller already wrote to their final\nkeys, all or none. Recording the same documents again is safe to retry; it keeps each\nrecord's `created_at` and refreshes `updated_at`.",
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/documents/batch-put",
+                    "code": 204
+                },
+                "smithy.api#idempotent": {},
+                "smithy.api#suppress": [
+                    "HttpMethodSemantics.UnnecessaryIdempotentTrait"
+                ]
+            }
+        },
+        "ccf#BatchPutCustomConnectorDocumentsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#default": "col-default"
+                    }
+                },
+                "source_collection_id": {
+                    "target": "ccf#SourceCollectionId",
+                    "traits": {
+                        "smithy.api#documentation": "Required for every collection except col-default, which takes none."
+                    }
+                },
+                "documents": {
+                    "target": "ccf#DocumentRecordList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#BucketName": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 3,
+                    "max": 63
+                },
+                "smithy.api#pattern": "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$"
+            }
+        },
+        "ccf#Caller": {
+            "type": "enum",
+            "members": {
+                "TENANT": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "TENANT"
+                    }
+                },
+                "RUNTIME": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "RUNTIME"
+                    }
+                }
+            }
+        },
+        "ccf#CallerHeaders": {
+            "type": "structure",
+            "members": {
+                "correlation_id": {
+                    "target": "ccf#CorrelationId",
+                    "traits": {
+                        "smithy.api#documentation": "Ties together the request's log lines; the response returns it. CCF creates one when it's left out.",
+                        "smithy.api#httpHeader": "x-correlation-id"
+                    }
+                },
+                "tenant_arn_prefix": {
+                    "target": "ccf#TenantArnPrefix",
+                    "traits": {
+                        "smithy.api#documentation": "Sent only by a custom connector's runtime role, to name the tenant it acts for.",
+                        "smithy.api#httpHeader": "x-ccf-tenant-arn-prefix"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#mixin": {}
+            }
+        },
+        "ccf#Checkpoint": {
+            "type": "structure",
+            "members": {
+                "checkpoint_data": {
+                    "target": "ccf#CheckpointData",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#CheckpointData": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Opaque to CCF: never parsed. CCF also rejects a value over 16,384 UTF-8 bytes.",
+                "smithy.api#length": {
+                    "min": 2,
+                    "max": 16384
+                },
+                "smithy.api#sensitive": {}
+            }
+        },
+        "ccf#ClientToken": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 64
+                }
+            }
+        },
+        "ccf#Collection": {
+            "type": "structure",
+            "members": {
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_collection_id": {
+                    "target": "ccf#SourceCollectionId",
+                    "traits": {
+                        "smithy.api#documentation": "Absent for col-default."
+                    }
+                },
+                "checkpoint_data": {
+                    "target": "ccf#CheckpointData"
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#CollectionId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "col-default, or col- plus the first 16 hex characters of the SHA-256 of the source collection ID.",
+                "smithy.api#pattern": "^(col-default|col-[0-9a-f]{16})$"
+            }
+        },
+        "ccf#CollectionList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#Collection"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#CollectionReference": {
+            "type": "structure",
+            "members": {
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#CollectionReferenceList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#CollectionReference"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 100
+                },
+                "smithy.api#uniqueItems": {}
+            }
+        },
+        "ccf#CollectionResource": {
+            "type": "resource",
+            "identifiers": {
+                "destination_id": {
+                    "target": "ccf#DestinationId"
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId"
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId"
+                }
+            },
+            "list": {
+                "target": "ccf#ListCustomConnectorCollections"
+            },
+            "collectionOperations": [
+                {
+                    "target": "ccf#BatchDeleteCustomConnectorCollections"
+                }
+            ]
+        },
+        "ccf#CommandArgument": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#ConflictException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "The request conflicts with the resource's status, a running job, an earlier\nrequest with the same client token, or a collection that still holds documents.",
+                "smithy.api#error": "client",
+                "smithy.api#httpError": 409
+            }
+        },
+        "ccf#Connector": {
+            "type": "structure",
+            "members": {
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "status": {
+                    "target": "ccf#ConnectorStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "runtime_role_arn": {
+                    "target": "ccf#RoleArn",
+                    "traits": {
+                        "smithy.api#documentation": "The role the custom connector's jobs run as. Name it as the source-access role's trust principal.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "container_properties": {
+                    "target": "ccf#ContainerProperties",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_configuration": {
+                    "target": "ccf#ConnectorConfiguration"
+                },
+                "source_access": {
+                    "target": "ccf#SourceAccess",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "log_destination": {
+                    "target": "ccf#LogDestination"
+                },
+                "schedule": {
+                    "target": "ccf#ConnectorSchedule"
+                }
+            }
+        },
+        "ccf#ConnectorCommand": {
+            "type": "list",
+            "member": {
+                "target": "ccf#CommandArgument"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#ConnectorConfiguration": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Opaque to CCF: never parsed. CCF also rejects a value over 65,536 UTF-8 bytes.",
+                "smithy.api#length": {
+                    "max": 65536
+                },
+                "smithy.api#sensitive": {}
+            }
+        },
+        "ccf#ConnectorId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^cc-[0-9a-f]{12}$"
+            }
+        },
+        "ccf#ConnectorSchedule": {
+            "type": "structure",
+            "members": {
+                "expression": {
+                    "target": "ccf#ScheduleExpression",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "state": {
+                    "target": "ccf#ScheduleState",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "timezone": {
+                    "target": "ccf#ScheduleTimezone"
+                }
+            }
+        },
+        "ccf#ConnectorStatus": {
+            "type": "enum",
+            "members": {
+                "AVAILABLE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "AVAILABLE"
+                    }
+                },
+                "IN_USE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "IN_USE"
+                    }
+                },
+                "DELETING": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "DELETING"
+                    }
+                }
+            }
+        },
+        "ccf#ConnectorSummary": {
+            "type": "structure",
+            "members": {
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "status": {
+                    "target": "ccf#ConnectorStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#ConnectorSummaryList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#ConnectorSummary"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#ContainerProperties": {
+            "type": "structure",
+            "members": {
+                "image_uri": {
+                    "target": "ccf#ImageUri",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "command": {
+                    "target": "ccf#ConnectorCommand",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "resource_requirements": {
+                    "target": "ccf#ResourceRequirements",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "timeout": {
+                    "target": "ccf#TimeoutSeconds",
+                    "traits": {
+                        "smithy.api#documentation": "Maximum job run time, in seconds.",
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#ContentHash": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 128
+                },
+                "smithy.api#pattern": "^[A-Za-z0-9+/=_:.-]+$"
+            }
+        },
+        "ccf#CorrelationId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^[A-Za-z0-9._:-]{1,64}$"
+            }
+        },
+        "ccf#CpuUnits": {
+            "type": "float",
+            "traits": {
+                "smithy.api#documentation": "At least 0.5, because the log router takes 0.25 vCPU of the job's task size.",
+                "smithy.api#range": {
+                    "min": 0.5,
+                    "max": 16.0
+                }
+            }
+        },
+        "ccf#CreateCustomConnector": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#CreateCustomConnectorRequest"
+            },
+            "output": {
+                "target": "ccf#CreateCustomConnectorResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors",
+                    "code": 201
+                }
+            }
+        },
+        "ccf#CreateCustomConnectorRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "container_properties": {
+                    "target": "ccf#ContainerProperties",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_configuration": {
+                    "target": "ccf#ConnectorConfiguration"
+                },
+                "source_access": {
+                    "target": "ccf#SourceAccessInput",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "log_destination": {
+                    "target": "ccf#LogDestination"
+                },
+                "schedule": {
+                    "target": "ccf#ConnectorSchedule"
+                },
+                "client_token": {
+                    "target": "ccf#ClientToken",
+                    "traits": {
+                        "smithy.api#idempotencyToken": {}
+                    }
+                }
+            }
+        },
+        "ccf#CreateCustomConnectorResponse": {
+            "type": "structure",
+            "members": {
+                "connector": {
+                    "target": "ccf#CreatedConnector",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#CreateDestination": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#CreateDestinationRequest"
+            },
+            "output": {
+                "target": "ccf#CreateDestinationResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Save the destination and start the workflow that creates its bucket and, for\nBEDROCK, its knowledge base and data source in the tenant's account.",
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations",
+                    "code": 201
+                }
+            }
+        },
+        "ccf#CreateDestinationRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "type": {
+                    "target": "ccf#DestinationType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "role_arn": {
+                    "target": "ccf#DestinationRoleArn",
+                    "traits": {
+                        "smithy.api#documentation": "The caller account's destination role.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "access_control_enabled": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#default": false,
+                        "smithy.api#documentation": "Turns on access control lists in the data source. Only BEDROCK accepts true."
+                    }
+                },
+                "client_token": {
+                    "target": "ccf#ClientToken",
+                    "traits": {
+                        "smithy.api#idempotencyToken": {}
+                    }
+                }
+            }
+        },
+        "ccf#CreateDestinationResponse": {
+            "type": "structure",
+            "members": {
+                "destination": {
+                    "target": "ccf#CreatedDestination",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#CreatedConnector": {
+            "type": "structure",
+            "members": {
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "status": {
+                    "target": "ccf#ConnectorStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "runtime_role_arn": {
+                    "target": "ccf#RoleArn",
+                    "traits": {
+                        "smithy.api#documentation": "The role the custom connector's jobs run as. Name it as the source-access role's trust principal.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_access": {
+                    "target": "ccf#SourceAccess",
+                    "traits": {
+                        "smithy.api#documentation": "The external ID the source-access role's trust policy requires.",
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "The custom connector as CreateCustomConnector returns it."
+            }
+        },
+        "ccf#CreatedDestination": {
+            "type": "structure",
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "type": {
+                    "target": "ccf#DestinationType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "access_control_enabled": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#DestinationStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "The destination as CreateDestination returns it, before its workflow runs."
+            }
+        },
+        "ccf#CustomConnectorFramework": {
+            "type": "service",
+            "version": "2026-11-01",
+            "resources": [
+                {
+                    "target": "ccf#DestinationResource"
+                }
+            ],
+            "errors": [
+                {
+                    "target": "ccf#BadRequestException"
+                },
+                {
+                    "target": "ccf#InternalServerError"
+                },
+                {
+                    "target": "ccf#ServiceUnavailableException"
+                },
+                {
+                    "target": "ccf#ThrottlingException"
+                },
+                {
+                    "target": "ccf#UnauthorizedException"
+                }
+            ],
+            "traits": {
+                "aws.api#service": {
+                    "sdkId": "ccf",
+                    "arnNamespace": "execute-api"
+                },
+                "aws.auth#sigv4": {
+                    "name": "execute-api"
+                },
+                "aws.protocols#restJson1": {},
+                "smithy.api#documentation": "The Custom Connector Framework (CCF) API. A tenant creates destinations in its\nown account and custom connectors that write documents into them; CCF runs each\ncustom connector job as a container on AWS Batch.\n\nCallers sign with SigV4 (signing name execute-api). OpenAPI and the Pydantic\nmodels are generated from this model.",
+                "smithy.api#title": "Custom Connector Framework API"
+            }
+        },
+        "ccf#CustomConnectorResource": {
+            "type": "resource",
+            "identifiers": {
+                "destination_id": {
+                    "target": "ccf#DestinationId"
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId"
+                }
+            },
+            "create": {
+                "target": "ccf#CreateCustomConnector"
+            },
+            "read": {
+                "target": "ccf#GetCustomConnector"
+            },
+            "update": {
+                "target": "ccf#UpdateCustomConnector"
+            },
+            "delete": {
+                "target": "ccf#DeleteCustomConnector"
+            },
+            "list": {
+                "target": "ccf#ListCustomConnectors"
+            },
+            "operations": [
+                {
+                    "target": "ccf#DeleteCustomConnectorCheckpoint"
+                },
+                {
+                    "target": "ccf#GetCustomConnectorCheckpoint"
+                },
+                {
+                    "target": "ccf#PutCustomConnectorCheckpoint"
+                }
+            ],
+            "resources": [
+                {
+                    "target": "ccf#CollectionResource"
+                },
+                {
+                    "target": "ccf#DocumentResource"
+                },
+                {
+                    "target": "ccf#JobResource"
+                }
+            ]
+        },
+        "ccf#DataSourceId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^[0-9A-Za-z]{10}$"
+            }
+        },
+        "ccf#DeleteCustomConnector": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#DeleteCustomConnectorRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Start the workflow that deletes the custom connector's documents, collections,\nruntime role, schedule, and then its record.",
+                "smithy.api#http": {
+                    "method": "DELETE",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}",
+                    "code": 202
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#DeleteCustomConnectorCheckpoint": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#DeleteCustomConnectorCheckpointRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Remove the collection's checkpoint so the next job reads the source from the\nstart. Fails while a job runs; succeeds when no checkpoint is stored.",
+                "smithy.api#http": {
+                    "method": "DELETE",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/checkpoint",
+                    "code": 204
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#DeleteCustomConnectorCheckpointRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#default": "col-default",
+                        "smithy.api#httpQuery": "collection_id"
+                    }
+                }
+            }
+        },
+        "ccf#DeleteCustomConnectorRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#DeleteDestination": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#DeleteDestinationRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Start the workflow that deletes the destination's resources and then its record.\nFails while the destination is being created or still holds a custom connector.",
+                "smithy.api#http": {
+                    "method": "DELETE",
+                    "uri": "/api/v1/destinations/{destination_id}",
+                    "code": 202
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#DeleteDestinationRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#Description": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#Destination": {
+            "type": "structure",
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "type": {
+                    "target": "ccf#DestinationType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "access_control_enabled": {
+                    "target": "smithy.api#Boolean",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#DestinationStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status_reason": {
+                    "target": "ccf#StatusReason"
+                },
+                "role_arn": {
+                    "target": "ccf#RoleArn",
+                    "traits": {
+                        "smithy.api#documentation": "The tenant's destination role, which CCF assumes to reach the destination's resources.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "destination_resources": {
+                    "target": "ccf#DestinationResources",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "metadata_fields": {
+                    "target": "ccf#MetadataFieldList",
+                    "traits": {
+                        "smithy.api#default": [],
+                        "smithy.api#documentation": "The knowledge base's custom metadata fields, which UpdateDestination sets: empty until then, and for S3 and\nQUICK."
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#DestinationId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^dst-[0-9a-f]{12}$"
+            }
+        },
+        "ccf#DestinationResource": {
+            "type": "resource",
+            "identifiers": {
+                "destination_id": {
+                    "target": "ccf#DestinationId"
+                }
+            },
+            "create": {
+                "target": "ccf#CreateDestination"
+            },
+            "read": {
+                "target": "ccf#GetDestination"
+            },
+            "update": {
+                "target": "ccf#UpdateDestination"
+            },
+            "delete": {
+                "target": "ccf#DeleteDestination"
+            },
+            "list": {
+                "target": "ccf#ListDestinations"
+            },
+            "resources": [
+                {
+                    "target": "ccf#CustomConnectorResource"
+                }
+            ]
+        },
+        "ccf#DestinationResources": {
+            "type": "structure",
+            "members": {
+                "bucket_arn": {
+                    "target": "ccf#Arn"
+                },
+                "knowledge_base_arn": {
+                    "target": "ccf#Arn"
+                },
+                "data_source_id": {
+                    "target": "ccf#DataSourceId"
+                },
+                "knowledge_base_role_arn": {
+                    "target": "ccf#RoleArn"
+                },
+                "bucket_name": {
+                    "target": "ccf#BucketName"
+                },
+                "knowledge_base_id": {
+                    "target": "ccf#KnowledgeBaseId"
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Each member is set once its resource exists."
+            }
+        },
+        "ccf#DestinationRoleArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A destination role: role/ccf/destinations/CcfDestinationRole-<name> in any partition.",
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):iam::[0-9]{12}:role/ccf/destinations/CcfDestinationRole-[A-Za-z0-9._-]{1,45}$"
+            }
+        },
+        "ccf#DestinationStatus": {
+            "type": "enum",
+            "members": {
+                "CREATING_BUCKET": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "CREATING_BUCKET"
+                    }
+                },
+                "CREATING_KNOWLEDGE_BASE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "CREATING_KNOWLEDGE_BASE"
+                    }
+                },
+                "CREATING_DATA_SOURCE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "CREATING_DATA_SOURCE"
+                    }
+                },
+                "ACTIVE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "ACTIVE"
+                    }
+                },
+                "FAILED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "FAILED"
+                    }
+                },
+                "DELETING": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "DELETING"
+                    }
+                }
+            }
+        },
+        "ccf#DestinationSummary": {
+            "type": "structure",
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "type": {
+                    "target": "ccf#DestinationType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#DestinationStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#DestinationSummaryList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#DestinationSummary"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#DestinationType": {
+            "type": "enum",
+            "members": {
+                "BEDROCK": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "BEDROCK"
+                    }
+                },
+                "QUICK": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "QUICK"
+                    }
+                },
+                "S3": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "S3"
+                    }
+                }
+            }
+        },
+        "ccf#DocumentId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "doc- plus the first 16 hex characters of the SHA-256 of the source document ID.",
+                "smithy.api#pattern": "^doc-[0-9a-f]{16}$"
+            }
+        },
+        "ccf#DocumentIdList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#DocumentId"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 99
+                },
+                "smithy.api#uniqueItems": {}
+            }
+        },
+        "ccf#DocumentRecord": {
+            "type": "structure",
+            "members": {
+                "document_id": {
+                    "target": "ccf#DocumentId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_document_id": {
+                    "target": "ccf#SourceDocumentId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "content_hash": {
+                    "target": "ccf#ContentHash",
+                    "traits": {
+                        "smithy.api#documentation": "The content's hash, compared to skip unchanged documents.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_version": {
+                    "target": "ccf#SourceVersion"
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "A document whose file and metadata file the caller already wrote to their final keys."
+            }
+        },
+        "ccf#DocumentRecordList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#DocumentRecord"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 99
+                }
+            }
+        },
+        "ccf#DocumentResource": {
+            "type": "resource",
+            "identifiers": {
+                "destination_id": {
+                    "target": "ccf#DestinationId"
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId"
+                },
+                "document_id": {
+                    "target": "ccf#DocumentId"
+                }
+            },
+            "list": {
+                "target": "ccf#ListCustomConnectorDocuments"
+            },
+            "collectionOperations": [
+                {
+                    "target": "ccf#BatchDeleteCustomConnectorDocuments"
+                },
+                {
+                    "target": "ccf#BatchPutCustomConnectorDocuments"
+                }
+            ],
+            "traits": {
+                "smithy.api#documentation": "A child of the custom connector, not of the collection: its paths sit under the\ncustom connector and take collection_id in the body or query string."
+            }
+        },
+        "ccf#ErrorCode": {
+            "type": "enum",
+            "members": {
+                "BAD_REQUEST": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "BAD_REQUEST"
+                    }
+                },
+                "UNAUTHORIZED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "UNAUTHORIZED"
+                    }
+                },
+                "RESOURCE_NOT_FOUND": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "RESOURCE_NOT_FOUND"
+                    }
+                },
+                "CONFLICT": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "CONFLICT"
+                    }
+                },
+                "THROTTLED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "THROTTLED"
+                    }
+                },
+                "INTERNAL_SERVER_ERROR": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "INTERNAL_SERVER_ERROR"
+                    }
+                },
+                "SERVICE_UNAVAILABLE": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "SERVICE_UNAVAILABLE"
+                    }
+                }
+            }
+        },
+        "ccf#ErrorResponse": {
+            "type": "structure",
+            "members": {
+                "code": {
+                    "target": "ccf#ErrorCode",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "message": {
+                    "target": "ccf#SanitizedErrorMessage",
+                    "traits": {
+                        "smithy.api#documentation": "Safe to show the caller: it holds no internal detail or configuration value.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "request_id": {
+                    "target": "ccf#RequestId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Members every error response carries.",
+                "smithy.api#mixin": {}
+            }
+        },
+        "ccf#ExternalId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 2,
+                    "max": 1224
+                },
+                "smithy.api#pattern": "^[A-Za-z0-9_+=,.@:/-]+$"
+            }
+        },
+        "ccf#GetCustomConnector": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#GetCustomConnectorRequest"
+            },
+            "output": {
+                "target": "ccf#GetCustomConnectorResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}",
+                    "code": 200
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#GetCustomConnectorCheckpoint": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#GetCustomConnectorCheckpointRequest"
+            },
+            "output": {
+                "target": "ccf#GetCustomConnectorCheckpointResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/checkpoint",
+                    "code": 200
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#GetCustomConnectorCheckpointRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#default": "col-default",
+                        "smithy.api#httpQuery": "collection_id"
+                    }
+                }
+            }
+        },
+        "ccf#GetCustomConnectorCheckpointResponse": {
+            "type": "structure",
+            "members": {
+                "checkpoint": {
+                    "target": "ccf#Checkpoint",
+                    "traits": {
+                        "smithy.api#documentation": "Absent when no checkpoint is stored."
+                    }
+                }
+            }
+        },
+        "ccf#GetCustomConnectorJob": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#GetCustomConnectorJobRequest"
+            },
+            "output": {
+                "target": "ccf#GetCustomConnectorJobResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/jobs/{job_id}",
+                    "code": 200
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#GetCustomConnectorJobRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "job_id": {
+                    "target": "ccf#JobId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#GetCustomConnectorJobResponse": {
+            "type": "structure",
+            "members": {
+                "job": {
+                    "target": "ccf#Job",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#GetCustomConnectorRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#GetCustomConnectorResponse": {
+            "type": "structure",
+            "members": {
+                "connector": {
+                    "target": "ccf#Connector",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#GetDestination": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#GetDestinationRequest"
+            },
+            "output": {
+                "target": "ccf#GetDestinationResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}",
+                    "code": 200
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#GetDestinationRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#documentation": "Sent by a runtime role to name the custom connector it runs for.",
+                        "smithy.api#httpHeader": "x-ccf-connector-id"
+                    }
+                }
+            }
+        },
+        "ccf#GetDestinationResponse": {
+            "type": "structure",
+            "members": {
+                "destination": {
+                    "target": "ccf#Destination",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#ImageUri": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "An image in an ECR repository under ccf-connectors/, tagged or pinned by digest, in any partition:\namazonaws.com, amazonaws.com.cn for aws-cn, or amazonaws.eu for aws-eusc.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^[0-9]{12}\\.dkr\\.ecr\\.(cn(?:-[a-z]+)+-[0-9]+\\.amazonaws\\.com\\.cn|eusc(?:-[a-z]+)+-[0-9]+\\.amazonaws\\.eu|(?:[a-bd-z][a-z]|c[a-mo-z])(?:-[a-z]+)+-[0-9]+\\.amazonaws\\.com)/ccf-connectors/[a-z0-9]+([._/-][a-z0-9]+)*(:[A-Za-z0-9_][A-Za-z0-9._-]{0,127}|@sha256:[a-f0-9]{64})$"
+            }
+        },
+        "ccf#InternalServerError": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#error": "server",
+                "smithy.api#httpError": 500
+            }
+        },
+        "ccf#Job": {
+            "type": "structure",
+            "members": {
+                "job_id": {
+                    "target": "ccf#JobId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#JobStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status_reason": {
+                    "target": "ccf#StatusReason"
+                },
+                "job_configuration": {
+                    "target": "ccf#JobConfiguration"
+                },
+                "service_execution": {
+                    "target": "ccf#ServiceExecution"
+                }
+            }
+        },
+        "ccf#JobConfiguration": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "Opaque to CCF: never parsed. CCF also rejects a value over 65,536 UTF-8 bytes.",
+                "smithy.api#length": {
+                    "max": 65536
+                },
+                "smithy.api#sensitive": {}
+            }
+        },
+        "ccf#JobId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^ccj-([0-9a-f]{12}|[0-9a-f]{32})$"
+            }
+        },
+        "ccf#JobResource": {
+            "type": "resource",
+            "identifiers": {
+                "destination_id": {
+                    "target": "ccf#DestinationId"
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId"
+                },
+                "job_id": {
+                    "target": "ccf#JobId"
+                }
+            },
+            "create": {
+                "target": "ccf#StartCustomConnectorJob"
+            },
+            "read": {
+                "target": "ccf#GetCustomConnectorJob"
+            },
+            "list": {
+                "target": "ccf#ListCustomConnectorJobs"
+            },
+            "operations": [
+                {
+                    "target": "ccf#StopCustomConnectorJob"
+                }
+            ]
+        },
+        "ccf#JobStatus": {
+            "type": "enum",
+            "members": {
+                "STARTED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "STARTED"
+                    }
+                },
+                "RUNNING": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "RUNNING"
+                    }
+                },
+                "STOPPING": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "STOPPING"
+                    }
+                },
+                "STOPPED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "STOPPED"
+                    }
+                },
+                "FAILED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "FAILED"
+                    }
+                },
+                "SUCCEEDED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "SUCCEEDED"
+                    }
+                }
+            }
+        },
+        "ccf#JobSummary": {
+            "type": "structure",
+            "members": {
+                "job_id": {
+                    "target": "ccf#JobId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#Arn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#JobStatus",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#JobSummaryList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#JobSummary"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#KnowledgeBaseId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^[0-9A-Za-z]{10}$"
+            }
+        },
+        "ccf#ListCustomConnectorCollections": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#ListCustomConnectorCollectionsRequest"
+            },
+            "output": {
+                "target": "ccf#ListCustomConnectorCollectionsResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/collections",
+                    "code": 200
+                },
+                "smithy.api#paginated": {
+                    "inputToken": "next_token",
+                    "outputToken": "next_token",
+                    "pageSize": "max_results",
+                    "items": "collections"
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#ListCustomConnectorCollectionsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#documentation": "Return only this collection.",
+                        "smithy.api#httpQuery": "collection_id"
+                    }
+                },
+                "max_results": {
+                    "target": "ccf#MaxResults",
+                    "traits": {
+                        "smithy.api#default": 100,
+                        "smithy.api#httpQuery": "max_results"
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken",
+                    "traits": {
+                        "smithy.api#httpQuery": "next_token"
+                    }
+                }
+            }
+        },
+        "ccf#ListCustomConnectorCollectionsResponse": {
+            "type": "structure",
+            "members": {
+                "collections": {
+                    "target": "ccf#CollectionList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken"
+                }
+            }
+        },
+        "ccf#ListCustomConnectorDocuments": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#ListCustomConnectorDocumentsRequest"
+            },
+            "output": {
+                "target": "ccf#ListCustomConnectorDocumentsResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#documentation": "List recorded documents in collection ID and then document ID order, optionally in one collection.",
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/documents",
+                    "code": 200
+                },
+                "smithy.api#paginated": {
+                    "inputToken": "next_token",
+                    "outputToken": "next_token",
+                    "pageSize": "max_results",
+                    "items": "documents"
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#ListCustomConnectorDocumentsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#documentation": "Return only the documents in this collection.",
+                        "smithy.api#httpQuery": "collection_id"
+                    }
+                },
+                "max_results": {
+                    "target": "ccf#MaxResults",
+                    "traits": {
+                        "smithy.api#default": 100,
+                        "smithy.api#httpQuery": "max_results"
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken",
+                    "traits": {
+                        "smithy.api#httpQuery": "next_token"
+                    }
+                }
+            }
+        },
+        "ccf#ListCustomConnectorDocumentsResponse": {
+            "type": "structure",
+            "members": {
+                "documents": {
+                    "target": "ccf#StoredDocumentList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken"
+                }
+            }
+        },
+        "ccf#ListCustomConnectorJobs": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#ListCustomConnectorJobsRequest"
+            },
+            "output": {
+                "target": "ccf#ListCustomConnectorJobsResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/jobs",
+                    "code": 200
+                },
+                "smithy.api#paginated": {
+                    "inputToken": "next_token",
+                    "outputToken": "next_token",
+                    "pageSize": "max_results",
+                    "items": "jobs"
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#ListCustomConnectorJobsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "status": {
+                    "target": "ccf#JobStatus",
+                    "traits": {
+                        "smithy.api#httpQuery": "status"
+                    }
+                },
+                "max_results": {
+                    "target": "ccf#MaxResults",
+                    "traits": {
+                        "smithy.api#default": 100,
+                        "smithy.api#httpQuery": "max_results"
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken",
+                    "traits": {
+                        "smithy.api#httpQuery": "next_token"
+                    }
+                }
+            }
+        },
+        "ccf#ListCustomConnectorJobsResponse": {
+            "type": "structure",
+            "members": {
+                "jobs": {
+                    "target": "ccf#JobSummaryList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken"
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Jobs are newest first."
+            }
+        },
+        "ccf#ListCustomConnectors": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#ListCustomConnectorsRequest"
+            },
+            "output": {
+                "target": "ccf#ListCustomConnectorsResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors",
+                    "code": 200
+                },
+                "smithy.api#paginated": {
+                    "inputToken": "next_token",
+                    "outputToken": "next_token",
+                    "pageSize": "max_results",
+                    "items": "connectors"
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#ListCustomConnectorsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#documentation": "Return only the custom connectors with exactly this name.",
+                        "smithy.api#httpQuery": "name"
+                    }
+                },
+                "max_results": {
+                    "target": "ccf#MaxResults",
+                    "traits": {
+                        "smithy.api#default": 100,
+                        "smithy.api#httpQuery": "max_results"
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken",
+                    "traits": {
+                        "smithy.api#httpQuery": "next_token"
+                    }
+                }
+            }
+        },
+        "ccf#ListCustomConnectorsResponse": {
+            "type": "structure",
+            "members": {
+                "connectors": {
+                    "target": "ccf#ConnectorSummaryList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken"
+                }
+            }
+        },
+        "ccf#ListDestinations": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#ListDestinationsRequest"
+            },
+            "output": {
+                "target": "ccf#ListDestinationsResponse"
+            },
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#http": {
+                    "method": "GET",
+                    "uri": "/api/v1/destinations",
+                    "code": 200
+                },
+                "smithy.api#paginated": {
+                    "inputToken": "next_token",
+                    "outputToken": "next_token",
+                    "pageSize": "max_results",
+                    "items": "destinations"
+                },
+                "smithy.api#readonly": {}
+            }
+        },
+        "ccf#ListDestinationsRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "name": {
+                    "target": "ccf#ResourceName",
+                    "traits": {
+                        "smithy.api#documentation": "Return only the destinations with exactly this name.",
+                        "smithy.api#httpQuery": "name"
+                    }
+                },
+                "max_results": {
+                    "target": "ccf#MaxResults",
+                    "traits": {
+                        "smithy.api#default": 100,
+                        "smithy.api#httpQuery": "max_results"
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken",
+                    "traits": {
+                        "smithy.api#httpQuery": "next_token"
+                    }
+                }
+            }
+        },
+        "ccf#ListDestinationsResponse": {
+            "type": "structure",
+            "members": {
+                "destinations": {
+                    "target": "ccf#DestinationSummaryList",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "next_token": {
+                    "target": "ccf#PaginationToken"
+                }
+            }
+        },
+        "ccf#LogDeliveryRoleArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A role in the caller's account named CcfLogDeliveryRole-<name>, with no path.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):iam::[0-9]{12}:role/CcfLogDeliveryRole-[A-Za-z0-9+=,.@_-]{1,45}$"
+            }
+        },
+        "ccf#LogDestination": {
+            "type": "structure",
+            "members": {
+                "type": {
+                    "target": "ccf#LogDestinationType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "arn": {
+                    "target": "ccf#LogGroupArn",
+                    "traits": {
+                        "smithy.api#documentation": "A log group in the caller's account and the service Region.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "role_arn": {
+                    "target": "ccf#LogDeliveryRoleArn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Where the connector container's log lines go, in the caller's account."
+            }
+        },
+        "ccf#LogDestinationType": {
+            "type": "enum",
+            "members": {
+                "CLOUDWATCH_LOGS": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "CLOUDWATCH_LOGS"
+                    }
+                }
+            }
+        },
+        "ccf#LogGroupArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A CloudWatch Logs log group ARN, optionally ending in :*.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):logs:[a-z0-9-]+:[0-9]{12}:log-group:[.\\-_/#A-Za-z0-9]{1,512}(:\\*)?$"
+            }
+        },
+        "ccf#MaxResults": {
+            "type": "integer",
+            "traits": {
+                "smithy.api#range": {
+                    "min": 1,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#MemoryMib": {
+            "type": "integer",
+            "traits": {
+                "smithy.api#documentation": "At least 1,024, because the log router takes 512 MiB of the job's task size.",
+                "smithy.api#range": {
+                    "min": 1024,
+                    "max": 122880
+                }
+            }
+        },
+        "ccf#MetadataField": {
+            "type": "structure",
+            "members": {
+                "name": {
+                    "target": "ccf#MetadataFieldName",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "type": {
+                    "target": "ccf#MetadataFieldType",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "searchability": {
+                    "target": "ccf#MetadataFieldSearchability",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "One custom metadata field of a BEDROCK destination's knowledge base."
+            }
+        },
+        "ccf#MetadataFieldList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#MetadataField"
+            },
+            "traits": {
+                "smithy.api#documentation": "Up to 30 fields, the knowledge base's limit, each name once.",
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 30
+                }
+            }
+        },
+        "ccf#MetadataFieldName": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A metadata field's name, as documents' metadata files spell it. A leading underscore is reserved by Bedrock.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 200
+                },
+                "smithy.api#pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+            }
+        },
+        "ccf#MetadataFieldSearchability": {
+            "type": "enum",
+            "members": {
+                "ENABLED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "ENABLED"
+                    }
+                },
+                "DISABLED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "DISABLED"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Whether the knowledge base makes the field searchable, Bedrock's `searchability` setting."
+            }
+        },
+        "ccf#MetadataFieldType": {
+            "type": "enum",
+            "members": {
+                "STRING": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "STRING"
+                    }
+                },
+                "STRING_LIST": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "STRING_LIST"
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "The value a metadata field holds: Bedrock declares only these two types."
+            }
+        },
+        "ccf#PaginationToken": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                }
+            }
+        },
+        "ccf#PutCustomConnectorCheckpoint": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#PutCustomConnectorCheckpointRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT",
+                    "RUNTIME"
+                ],
+                "smithy.api#documentation": "Replace the collection's checkpoint. CCF checks only its size and never parses it.",
+                "smithy.api#http": {
+                    "method": "PUT",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/checkpoint",
+                    "code": 204
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#PutCustomConnectorCheckpointRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#default": "col-default"
+                    }
+                },
+                "source_collection_id": {
+                    "target": "ccf#SourceCollectionId",
+                    "traits": {
+                        "smithy.api#documentation": "Required for every collection except col-default, which takes none."
+                    }
+                },
+                "checkpoint_data": {
+                    "target": "ccf#CheckpointData",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#RequestId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 128
+                }
+            }
+        },
+        "ccf#ResourceName": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 64
+                },
+                "smithy.api#pattern": "^[A-Za-z0-9._-]{1,64}$"
+            }
+        },
+        "ccf#ResourceNotFoundException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "A resource in the path doesn't exist for the caller's tenant and parent.",
+                "smithy.api#error": "client",
+                "smithy.api#httpError": 404
+            }
+        },
+        "ccf#ResourceRequirements": {
+            "type": "structure",
+            "members": {
+                "cpu": {
+                    "target": "ccf#CpuUnits",
+                    "traits": {
+                        "smithy.api#documentation": "vCPU for the job's task. The connector container gets this minus 0.25 vCPU for the log router.",
+                        "smithy.api#required": {}
+                    }
+                },
+                "memory": {
+                    "target": "ccf#MemoryMib",
+                    "traits": {
+                        "smithy.api#documentation": "Memory for the job's task, in MiB. The connector container gets this minus 512 MiB for the log router.",
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#RoleArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_-]+(/[A-Za-z0-9+=,.@_-]+)*$"
+            }
+        },
+        "ccf#SanitizedErrorMessage": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#ScheduleExpression": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 256
+                }
+            }
+        },
+        "ccf#ScheduleState": {
+            "type": "enum",
+            "members": {
+                "ENABLED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "ENABLED"
+                    }
+                },
+                "DISABLED": {
+                    "target": "smithy.api#Unit",
+                    "traits": {
+                        "smithy.api#enumValue": "DISABLED"
+                    }
+                }
+            }
+        },
+        "ccf#ScheduleTimezone": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 256
+                }
+            }
+        },
+        "ccf#SecretArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+$"
+            }
+        },
+        "ccf#ServiceExecution": {
+            "type": "structure",
+            "members": {
+                "execution_id": {
+                    "target": "ccf#ServiceExecutionId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "execution_role_arn": {
+                    "target": "ccf#RoleArn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "job_role_arn": {
+                    "target": "ccf#RoleArn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "started_at": {
+                    "target": "smithy.api#Timestamp"
+                },
+                "completed_at": {
+                    "target": "smithy.api#Timestamp"
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Set by CCF from the AWS Batch job when the job ends. A job stopped through the API has none."
+            }
+        },
+        "ccf#ServiceExecutionId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 256
+                }
+            }
+        },
+        "ccf#ServiceUnavailableException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#error": "server",
+                "smithy.api#httpError": 503
+            }
+        },
+        "ccf#SourceAccess": {
+            "type": "structure",
+            "members": {
+                "role_arn": {
+                    "target": "ccf#SourceRoleArn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "secret_arn": {
+                    "target": "ccf#SecretArn"
+                },
+                "external_id": {
+                    "target": "ccf#ExternalId",
+                    "traits": {
+                        "smithy.api#documentation": "Generated by CCF. The source-access role's trust policy requires it.",
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#SourceAccessInput": {
+            "type": "structure",
+            "members": {
+                "role_arn": {
+                    "target": "ccf#SourceRoleArn",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "secret_arn": {
+                    "target": "ccf#SecretArn",
+                    "traits": {
+                        "smithy.api#documentation": "A Secrets Manager secret in the caller's account and the service Region."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "The source-access role and secret a caller registers."
+            }
+        },
+        "ccf#SourceCollectionId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#SourceDocumentId": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#SourceRoleArn": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "A role in the caller's account named CcfSourceRole-<name>, with no path.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):iam::[0-9]{12}:role/CcfSourceRole-[A-Za-z0-9+=,.@_-]{1,50}$"
+            }
+        },
+        "ccf#SourceVersion": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 1024
+                }
+            }
+        },
+        "ccf#StartCustomConnectorJob": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#StartCustomConnectorJobRequest"
+            },
+            "output": {
+                "target": "ccf#StartCustomConnectorJobResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/jobs",
+                    "code": 201
+                }
+            }
+        },
+        "ccf#StartCustomConnectorJobRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "job_configuration": {
+                    "target": "ccf#JobConfiguration"
+                },
+                "client_token": {
+                    "target": "ccf#ClientToken",
+                    "traits": {
+                        "smithy.api#idempotencyToken": {}
+                    }
+                }
+            }
+        },
+        "ccf#StartCustomConnectorJobResponse": {
+            "type": "structure",
+            "members": {
+                "job": {
+                    "target": "ccf#JobSummary",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#StatusReason": {
+            "type": "string",
+            "traits": {
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                }
+            }
+        },
+        "ccf#StopCustomConnectorJob": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#StopCustomConnectorJobRequest"
+            },
+            "output": {
+                "target": "smithy.api#Unit"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Stop the job's execution, which asks AWS Batch to stop the job, and set the job STOPPED. A job that\nalready ended conflicts.",
+                "smithy.api#http": {
+                    "method": "POST",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}/jobs/{job_id}/stop",
+                    "code": 202
+                },
+                "smithy.api#idempotent": {},
+                "smithy.api#suppress": [
+                    "HttpMethodSemantics.UnnecessaryIdempotentTrait"
+                ]
+            }
+        },
+        "ccf#StopCustomConnectorJobRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "job_id": {
+                    "target": "ccf#JobId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#StoredDocument": {
+            "type": "structure",
+            "members": {
+                "collection_id": {
+                    "target": "ccf#CollectionId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "document_id": {
+                    "target": "ccf#DocumentId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_document_id": {
+                    "target": "ccf#SourceDocumentId",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "content_hash": {
+                    "target": "ccf#ContentHash",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "source_version": {
+                    "target": "ccf#SourceVersion"
+                },
+                "created_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                },
+                "updated_at": {
+                    "target": "smithy.api#Timestamp",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#StoredDocumentList": {
+            "type": "list",
+            "member": {
+                "target": "ccf#StoredDocument"
+            },
+            "traits": {
+                "smithy.api#length": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        },
+        "ccf#TenantArnPrefix": {
+            "type": "string",
+            "traits": {
+                "smithy.api#documentation": "arn:<partition>:ccf:<Region>:<account ID>, the prefix of every CCF ARN a tenant owns.",
+                "smithy.api#length": {
+                    "min": 1,
+                    "max": 2048
+                },
+                "smithy.api#pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):ccf:(?:[a-z]{2}|eusc)(?:-[a-z]+)+-[0-9]+:[0-9]{12}$"
+            }
+        },
+        "ccf#ThrottlingException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#error": "client",
+                "smithy.api#httpError": 429
+            }
+        },
+        "ccf#TimeoutSeconds": {
+            "type": "integer",
+            "traits": {
+                "smithy.api#range": {
+                    "min": 60,
+                    "max": 604800
+                }
+            }
+        },
+        "ccf#UnauthorizedException": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#ErrorResponse"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "The caller isn't allowed to call the operation, or its account isn't an allowed tenant account.",
+                "smithy.api#error": "client",
+                "smithy.api#httpError": 403
+            }
+        },
+        "ccf#UpdateContainerProperties": {
+            "type": "structure",
+            "members": {
+                "image_uri": {
+                    "target": "ccf#ImageUri"
+                },
+                "command": {
+                    "target": "ccf#ConnectorCommand"
+                },
+                "resource_requirements": {
+                    "target": "ccf#ResourceRequirements"
+                },
+                "timeout": {
+                    "target": "ccf#TimeoutSeconds"
+                }
+            }
+        },
+        "ccf#UpdateCustomConnector": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#UpdateCustomConnectorRequest"
+            },
+            "output": {
+                "target": "ccf#UpdateCustomConnectorResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Replace each member sent and keep each member left out.",
+                "smithy.api#http": {
+                    "method": "PUT",
+                    "uri": "/api/v1/destinations/{destination_id}/custom-connectors/{connector_id}",
+                    "code": 200
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#UpdateCustomConnectorRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "connector_id": {
+                    "target": "ccf#ConnectorId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "name": {
+                    "target": "ccf#ResourceName"
+                },
+                "description": {
+                    "target": "ccf#Description"
+                },
+                "container_properties": {
+                    "target": "ccf#UpdateContainerProperties"
+                },
+                "connector_configuration": {
+                    "target": "ccf#ConnectorConfiguration"
+                },
+                "source_access": {
+                    "target": "ccf#SourceAccessInput"
+                },
+                "log_destination": {
+                    "target": "ccf#LogDestination",
+                    "traits": {
+                        "ccf#clearable": {},
+                        "smithy.api#documentation": "Null removes the log destination; left out, it is kept."
+                    }
+                },
+                "schedule": {
+                    "target": "ccf#ConnectorSchedule",
+                    "traits": {
+                        "ccf#clearable": {},
+                        "smithy.api#documentation": "Null deletes the schedule; left out, it is kept."
+                    }
+                }
+            }
+        },
+        "ccf#UpdateCustomConnectorResponse": {
+            "type": "structure",
+            "members": {
+                "connector": {
+                    "target": "ccf#ConnectorSummary",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#UpdateDestination": {
+            "type": "operation",
+            "input": {
+                "target": "ccf#UpdateDestinationRequest"
+            },
+            "output": {
+                "target": "ccf#UpdateDestinationResponse"
+            },
+            "errors": [
+                {
+                    "target": "ccf#ConflictException"
+                },
+                {
+                    "target": "ccf#ResourceNotFoundException"
+                }
+            ],
+            "traits": {
+                "ccf#callers": [
+                    "TENANT"
+                ],
+                "smithy.api#documentation": "Set a BEDROCK destination's custom metadata fields on its knowledge base, then store them. The destination stays\nACTIVE, so jobs keep writing. Conflicts while the destination isn't ACTIVE, and while the knowledge base is still\napplying an earlier update.",
+                "smithy.api#http": {
+                    "method": "PUT",
+                    "uri": "/api/v1/destinations/{destination_id}",
+                    "code": 200
+                },
+                "smithy.api#idempotent": {}
+            }
+        },
+        "ccf#UpdateDestinationRequest": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "ccf#CallerHeaders"
+                }
+            ],
+            "members": {
+                "destination_id": {
+                    "target": "ccf#DestinationId",
+                    "traits": {
+                        "smithy.api#httpLabel": {},
+                        "smithy.api#required": {}
+                    }
+                },
+                "metadata_fields": {
+                    "target": "ccf#MetadataFieldList",
+                    "traits": {
+                        "smithy.api#documentation": "Replaces the knowledge base's custom metadata fields; an empty list removes them all.",
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#UpdateDestinationResponse": {
+            "type": "structure",
+            "members": {
+                "destination": {
+                    "target": "ccf#Destination",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "ccf#callers": {
+            "type": "list",
+            "member": {
+                "target": "ccf#Caller"
+            },
+            "traits": {
+                "smithy.api#documentation": "Who may call an operation: a tenant principal from an allowed account, a custom\nconnector's runtime role during a job, or both. The backend's caller check and the\nruntime role's API policy both read this trait from the generated OpenAPI document.",
+                "smithy.api#trait": {
+                    "selector": "operation"
+                },
+                "smithy.api#uniqueItems": {}
+            }
+        },
+        "ccf#clearable": {
+            "type": "structure",
+            "members": {},
+            "traits": {
+                "smithy.api#documentation": "An update member that null clears and omission keeps. The OpenAPI document lets the member\nbe null; `codegen/enrich_openapi.py` reads this trait.",
+                "smithy.api#trait": {
+                    "selector": "structure > member"
+                }
+            }
+        },
+        "smithy.openapi#SpecificationExtensionKey": {
+            "type": "string",
+            "traits": {
+                "smithy.api#pattern": "^x-.+$",
+                "smithy.api#private": {}
+            }
+        },
+        "smithy.openapi#specificationExtension": {
+            "type": "structure",
+            "members": {
+                "as": {
+                    "target": "smithy.openapi#SpecificationExtensionKey",
+                    "traits": {
+                        "smithy.api#documentation": "Explicitly name the specification extension.\nIf set must begin with `x-`, otherwise defaults to the target trait shape's ID normalized with hyphens and prepended with `x-`."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "Indicates a trait shape should be converted into an [OpenAPI specification extension](https://spec.openapis.org/oas/v3.1.0#specification-extensions).",
+                "smithy.api#trait": {
+                    "selector": "[trait|trait]",
+                    "breakingChanges": [
+                        {
+                            "change": "presence"
+                        },
+                        {
+                            "path": "/as",
+                            "change": "any"
+                        }
+                    ]
+                }
+            }
+        },
+        "smithy.protocols#StringList": {
+            "type": "list",
+            "member": {
+                "target": "smithy.api#String"
+            },
+            "traits": {
+                "smithy.api#documentation": "A list of String shapes.",
+                "smithy.api#private": {}
+            }
+        },
+        "smithy.protocols#rpcv2Cbor": {
+            "type": "structure",
+            "members": {
+                "http": {
+                    "target": "smithy.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "Priority ordered list of supported HTTP protocol versions."
+                    }
+                },
+                "eventStreamHttp": {
+                    "target": "smithy.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "Priority ordered list of supported HTTP protocol versions\nthat are required when using event streams."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "An RPC-based protocol that serializes CBOR payloads.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "smithy.api#httpError",
+                        "smithy.api#requestCompression"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                },
+                "smithy.api#traitValidators": {
+                    "rpcv2Cbor.NoDocuments": {
+                        "selector": "service ~> member :test(> document)",
+                        "message": "This protocol does not support document types in most possible scenarios.",
+                        "severity": "DANGER"
+                    }
+                }
+            }
+        },
+        "smithy.protocols#rpcv2Json": {
+            "type": "structure",
+            "members": {
+                "http": {
+                    "target": "smithy.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "Priority ordered list of supported HTTP protocol versions."
+                    }
+                },
+                "eventStreamHttp": {
+                    "target": "smithy.protocols#StringList",
+                    "traits": {
+                        "smithy.api#documentation": "Priority ordered list of supported HTTP protocol versions\nthat are required when using event streams."
+                    }
+                }
+            },
+            "traits": {
+                "smithy.api#documentation": "An RPC-based protocol that serializes JSON payloads.",
+                "smithy.api#protocolDefinition": {
+                    "traits": [
+                        "smithy.api#cors",
+                        "smithy.api#endpoint",
+                        "smithy.api#hostLabel",
+                        "smithy.api#httpError",
+                        "smithy.api#requestCompression"
+                    ]
+                },
+                "smithy.api#trait": {
+                    "selector": "service"
+                }
+            }
+        }
+    }
+}

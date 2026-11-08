@@ -1,0 +1,37 @@
+{
+  "$defs": {
+    "DestinationId": {
+      "pattern": "^dst-[0-9a-f]{12}$",
+      "type": "string"
+    },
+    "TenantArnPrefix": {
+      "description": "arn:<partition>:ccf:<Region>:<account ID>, the prefix of every CCF ARN a tenant owns.",
+      "maxLength": 2048,
+      "minLength": 1,
+      "pattern": "^arn:(aws|aws-us-gov|aws-cn|aws-eusc):ccf:(?:[a-z]{2}|eusc)(?:-[a-z]+)+-[0-9]+:[0-9]{12}$",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The body of one message on `CcfIngestionQueue`.",
+  "properties": {
+    "tenant_arn_prefix": {
+      "$ref": "#/$defs/TenantArnPrefix"
+    },
+    "destination_id": {
+      "$ref": "#/$defs/DestinationId"
+    },
+    "token": {
+      "pattern": "^ing-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "title": "Token",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenant_arn_prefix",
+    "destination_id",
+    "token"
+  ],
+  "title": "IngestionRequestMessage",
+  "type": "object"
+}

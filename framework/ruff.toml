@@ -1,0 +1,12 @@
+# The ruff settings every framework Python project extends with `[tool.ruff] extend = "../ruff.toml"`.
+line-length = 120
+target-version = "py314"
+
+[lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S", "ASYNC", "C901", "PLR2004"]
+
+[lint.per-file-ignores]
+"**/tests/**" = ["S101"]
+
+[lint.mccabe]
+max-complexity = 10
