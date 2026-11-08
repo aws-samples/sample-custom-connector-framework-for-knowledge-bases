@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "github-connector"
+version = "0.1.0"
+description = "Connector implementation that reads one GitHub owner's repositories into a destination."
+requires-python = ">=3.14"
+dependencies = [
+    "custom-connector-framework-toolkit",
+    "pathspec==1.1.1",
+    "pydantic==2.14.3",
+    "pygithub==2.10.0",
+    "requests==2.34.2",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.4",
+    "types-requests>=2.33.0.20261030",
+]
+
+[tool.uv.sources]
+custom-connector-framework-toolkit = { path = "../../../framework/toolkit", editable = true }
+# The toolkit's own dependency; it isn't on PyPI.
+ccf-api-models = { path = "../../../framework/api/packages/ccf-api-models" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S", "ASYNC", "C901", "PLR2004"]
+# UP042 (StrEnum): project style uses `(str, Enum)` for finite value sets.
+ignore = ["S101", "UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literal values and pass fake tokens to a fake GitHub.
+"tests/**" = ["PLR2004", "S105", "S106", "S107"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["activities", "common", "github_connector"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+plugins = ["pydantic.mypy"]
+mypy_path = ["src"]
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = "--import-mode=importlib"
+pythonpath = ["src"]

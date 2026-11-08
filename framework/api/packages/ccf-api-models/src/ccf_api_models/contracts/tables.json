@@ -1,0 +1,68 @@
+{
+  "destinations": {
+    "name": "CcfDestinations",
+    "partitionKey": { "name": "tenant_arn_prefix", "type": "STRING" },
+    "sortKey": { "name": "destination_id", "type": "STRING" },
+    "binaryAttributes": [],
+    "timeToLiveAttribute": null,
+    "indexes": {
+      "ByName": {
+        "partitionKey": { "name": "tenant_arn_prefix", "type": "STRING" },
+        "sortKey": { "name": "name", "type": "STRING" },
+        "projection": "DestinationSummary"
+      }
+    }
+  },
+  "connectors": {
+    "name": "CcfCustomConnectors",
+    "partitionKey": { "name": "tenant_arn_prefix", "type": "STRING" },
+    "sortKey": { "name": "destination_connector_key", "type": "STRING" },
+    "binaryAttributes": ["encrypted_configuration"],
+    "timeToLiveAttribute": null,
+    "indexes": {
+      "ByName": {
+        "partitionKey": { "name": "tenant_arn_prefix", "type": "STRING" },
+        "sortKey": { "name": "destination_name_key", "type": "STRING" },
+        "projection": "ConnectorSummary"
+      }
+    }
+  },
+  "jobs": {
+    "name": "CcfCustomConnectorJobs",
+    "partitionKey": { "name": "tenant_arn_prefix", "type": "STRING" },
+    "sortKey": { "name": "job_id", "type": "STRING" },
+    "binaryAttributes": ["encrypted_configuration"],
+    "timeToLiveAttribute": "ttl",
+    "indexes": {
+      "ByConnectorSummary": {
+        "partitionKey": { "name": "connector_key", "type": "STRING" },
+        "sortKey": { "name": "created_at", "type": "NUMBER" },
+        "projection": "JobSummary"
+      }
+    }
+  },
+  "collections": {
+    "name": "CcfCollections",
+    "partitionKey": { "name": "connector_arn", "type": "STRING" },
+    "sortKey": { "name": "collection_id", "type": "STRING" },
+    "binaryAttributes": ["encrypted_checkpoint"],
+    "timeToLiveAttribute": null,
+    "indexes": {}
+  },
+  "documents": {
+    "name": "CcfDocuments",
+    "partitionKey": { "name": "connector_arn", "type": "STRING" },
+    "sortKey": { "name": "collection_document_key", "type": "STRING" },
+    "binaryAttributes": [],
+    "timeToLiveAttribute": null,
+    "indexes": {}
+  },
+  "idempotency": {
+    "name": "CcfIdempotency",
+    "partitionKey": { "name": "id", "type": "STRING" },
+    "sortKey": null,
+    "binaryAttributes": [],
+    "timeToLiveAttribute": "expiration",
+    "indexes": {}
+  }
+}

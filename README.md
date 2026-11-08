@@ -1,343 +1,349 @@
 # Custom Connector Framework
 
-Knowledge bases in [Amazon Bedrock](https://aws.amazon.com/bedrock/) and
-[Amazon Quick](https://aws.amazon.com/quick/) include built-in connectors for
-common sources such as SharePoint, Confluence, and Google Drive, but neither
-service implements a connector for every system that holds an organization's
-documents. Both services can also ingest documents from an
-[Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) bucket,
-so a source without a built-in connector, such as a GitHub repository or a
-GitLab project, can still reach a knowledge base if something keeps a current
-copy of its documents in that bucket. The Custom Connector Framework (CCF) is a
-sample AWS service for building the custom connectors that keep that copy
-current. A connector author writes the code that reads the source. CCF runs that
-code on a schedule or on demand and manages each document's lifecycle in the
-bucket, writing new and changed documents and deleting the ones that disappeared
-from the source. The knowledge base still ingests the bucket and indexes its
-documents for vector search.
+Amazon Bedrock knowledge bases and Amazon Quick come with connectors for common
+sources, but not for every system a team keeps its documents in. Both can ingest
+an Amazon S3 bucket, so any source can reach them if something keeps a current
+copy of its documents in a bucket. The Custom Connector Framework (CCF) is a
+sample that runs the code you write for such a source in AWS Batch, on a
+schedule or on demand. Each job writes new and changed documents to a bucket in
+your account and deletes the ones the source no longer has. Bedrock then
+indexes them.
 
-## Purpose
+This repository holds the framework and one complete connector, for public
+GitHub repositories. The walkthrough below deploys both in one account, runs a
+job, and searches the indexed files with Amazon Bedrock `Retrieve` at the end.
 
-A knowledge base gives a generative AI application access to an organization's
-own documents. When someone asks a question, the knowledge base searches those
-documents for relevant passages, and the application passes them to a foundation
-model along with the question so the answer draws on that content. This
-technique is called retrieval-augmented generation (RAG), and both
-[Amazon Bedrock Managed Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html)
-and
-[knowledge bases in Amazon Quick](https://docs.aws.amazon.com/quick/latest/userguide/s3-integration.html)
-use it.
+## Concepts
 
-A knowledge base can only search documents it has ingested. Ingestion parses
-each document, splits it into passages, and indexes the passages for vector
-search, which matches a question to the passages closest to it in meaning. The
-documents themselves live in source systems such as code repositories, issue
-trackers, and websites. A built-in connector reads its source and ingests the
-documents directly. With an S3 data source, the knowledge base ingests whatever
-the bucket holds, so a custom connector only has to keep the bucket in step with
-the source, and the knowledge base handles ingestion from there.
+The walkthrough uses these terms. [DESIGN.md](./DESIGN.md#glossary)
+defines every term with an example.
 
-Reading the source is a small part of that custom connector. The connector also
-needs somewhere to run on a schedule or on demand, credentials for the source, a
-record of which documents it wrote on the last run so it can replace and delete
-the right objects, write access to the bucket without credentials in connector
-code, and a way to start ingestion after it writes. That code is the same for
-every connector, so CCF provides it once.
+| Term | Meaning |
+| --- | --- |
+| Service account | The AWS account the framework is deployed in. It runs the API, the job compute, and the workflows. |
+| Tenant account | The AWS account that owns destinations and registers custom connectors. The walkthrough uses one account as both. |
+| Destination | A bucket in the tenant account and, for type `BEDROCK`, a knowledge base and data source that read it. The framework creates it for you. |
+| Custom connector | A registered instance of your connector code: its container image, configuration, secret, schedule, and the destination it writes to. |
+| Job | One run of a custom connector. |
+| Connector implementation | Your code: one Python class whose `run()` reads the source and writes through the toolkit's `DocumentStore`. |
+| Toolkit | The `custom_connector_framework` Python package your code imports, and the CDK constructs your stacks use. |
+| Destination stack | The `CustomConnectorDestinationFor<Name>` stack the framework's CDK app deploys for one destination. It creates the destination's role in your account, `CcfDestinationRole-<name>`, and the destination. |
 
-## Terminology
+## How it works
 
-Knowledge base, RAG, ingestion, vector search, and connector are standard terms
-with the meanings described in [Purpose](#purpose). CCF also depends on these
-AWS terms:
-
-| AWS term                | Meaning                                                                                                                                                                                                                                                                                                                                                           |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Metadata file (sidecar) | A `<document>.metadata.json` file stored beside a document in S3 that carries the document's title, attributes, and access control list. Amazon Bedrock and Amazon Quick each define the format ([Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-metadata.html), [Quick](https://docs.aws.amazon.com/quick/latest/userguide/s3-metadata.html)). |
-| S3 data source          | The knowledge base setting that points it at an S3 bucket to ingest. Amazon Bedrock calls it a data source, and Amazon Quick calls it an [Amazon S3 integration](https://docs.aws.amazon.com/quick/latest/userguide/s3-integration.html).                                                                                                                         |
-| External ID             | A value that an IAM role's trust policy requires on every `AssumeRole` call, so only a caller that knows it can assume the role ([IAM docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html)).                                                                                                                          |
-
-The rest of this README uses CCF's own terms:
-
-| CCF term                 | Meaning                                                                                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework account        | The AWS account where CCF is deployed. It runs the CCF API, state, schedules, connector compute, and the destination S3 bucket.                                                     |
-| Client account           | An AWS account that registers connectors with CCF and holds their images and source-access roles.                                                                                   |
-| Tenant                   | A client account as CCF sees it. CCF keys every connector, job, and S3 prefix by the tenant's account ID, so one tenant cannot reach another tenant's connectors or documents.      |
-| Connector author         | The person who writes a custom connector's source-specific code.                                                                                                                    |
-| Toolkit                  | The `custom_connector_framework` Python package that connector code imports.                                                                                                        |
-| `CcfClient`              | The toolkit's typed Python client for the CCF API.                                                                                                                                  |
-| Connector definition     | The `ConnectorDefinition` value that binds a connector's configuration models and its `documents(context)` generator.                                                               |
-| Launcher                 | The `ccf-connector` command every connector image runs. It loads the connector definition, fetches configuration, assumes the source-access role, and runs reconciliation.          |
-| Job                      | One run of a connector, started on demand or by the connector's schedule.                                                                                                           |
-| Snapshot                 | Every document the source holds when a job runs, as yielded by `documents(context)`.                                                                                                |
-| Reconciliation           | Comparing a snapshot with the documents recorded on the last job, then writing and deleting S3 objects to match.                                                                    |
-| Source-access role       | An IAM role in the client account that the connector assumes, with the connector's external ID, to read source credentials.                                                         |
-| Framework execution role | The shared role that AWS Batch uses to pull connector images and write logs. Connector code never holds it.                                                                         |
-| Runtime role             | A role CCF creates for each connector at registration. The connector container runs as it, and it can reach only that connector's API resources, S3 prefix, and source-access role. |
-| Destination mode         | The deploy-time setting, `S3`, `BEDROCK`, or `QUICK`, that decides which sidecar the toolkit writes and what CCF does after a successful job.                                       |
-| Client stack             | The AWS CDK stack that deploys one connector's image and source-access role into its client account and registers the connector with CCF.                                           |
-
-## Writing a connector
-
-A connector author writes a [Pydantic](https://docs.pydantic.dev/) model for
-connector configuration, such as the GitHub repositories to read and the
-[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) ARN of the access
-token, and a second model for job configuration. A connector whose jobs take no
-settings uses the shared `EmptyJobConfiguration` instead. Each model sets
-`extra="forbid"`, `frozen=True`, and `strict=True`, so a misspelled or mistyped
-field fails validation instead of being ignored. The author also writes a
-`documents(context)` generator that yields the snapshot as
-`Document.from_bytes()` values, and binds the models and the generator in a
-`ConnectorDefinition`. The author packages the connector as a container image,
-and every connector image starts the launcher with the same command:
-
-```text
-ccf-connector run module:definition
-```
-
-[`toolkit/README.md`](./toolkit/README.md#author-contract) has the full contract
-and a complete example.
-
-## High-level design
-
-Everything in CCF runs in the framework account except what each client account
-owns, which is the connector image, stored in
-[Amazon Elastic Container Registry (Amazon ECR)](https://aws.amazon.com/ecr/),
-and the source-access role. A client account can be the framework account
-itself, which is how the sample deploy commands run, or another account that the
-framework deployment admits with its `allowedClientAccountIds` setting.
-
-The source-access role reads source credentials, such as a GitHub token stored
-in Secrets Manager. Its
-[AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) trust
-policy requires the connector's external ID, which the client supplies when it
-registers the connector, so no other caller can use CCF to assume the role.
-
-Clients call CCF through `CcfClient`, which sends
-[AWS Signature Version 4 (SigV4)](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html)
-signed requests to an [Amazon API Gateway](https://aws.amazon.com/api-gateway/)
-API in the framework account. Behind that API,
-[AWS Lambda](https://aws.amazon.com/lambda/) functions handle requests and
-dispatch jobs,
-[Amazon EventBridge Scheduler](https://aws.amazon.com/eventbridge/scheduler/)
-starts scheduled runs, [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-stores connector and job state with configuration encrypted under an
-[AWS Key Management Service (AWS KMS)](https://aws.amazon.com/kms/) key, and
-[AWS Batch](https://aws.amazon.com/batch/) runs the connector image.
-
-Each framework deployment creates its own S3 bucket and writes documents to it
-in one destination mode, chosen at deploy time. In `BEDROCK` mode the framework
-stack also creates the Bedrock knowledge base and its S3 data source for that
-bucket. In `QUICK` mode, the deployer creates the Amazon Quick knowledge base
-against the bucket. The destination mode decides which sidecar the toolkit
-writes beside each document and what CCF does after a successful job:
-
-| Mode      | Toolkit output                                                   | Service action after a successful job                                    |
-| --------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `S3`      | Document object                                                  | None                                                                     |
-| `BEDROCK` | Document object plus one Amazon Bedrock `.metadata.json` sidecar | Call `StartIngestionJob` for the deployed knowledge base and data source |
-| `QUICK`   | Document object plus one Amazon Quick `.metadata.json` sidecar   | None; Amazon Quick Index reads the configured bucket on its own schedule |
-
-![How a CCF connector job runs](./docs/diagrams/service-topology.png)
-
-_Figure 1: How a CCF connector job runs across the client and framework
-accounts._
-
-1. Register a connector, or start a job, through `CcfClient`.
-2. AWS Batch pulls the registered connector image.
-3. The connector, running in Batch, assumes the source-access role with its
-   external ID.
-4. The connector reads source data using that role.
-5. The connector writes documents and the optional sidecar to S3.
-6. **(Optional)** Bedrock mode: start ingestion after a successful job.
-7. **(Optional)** Quick mode: Amazon Quick Index reads the bucket on its own
-   schedule.
-
-The toolkit writes document bytes directly to the S3 bucket, so large files
-never run into the API Gateway request size limit. The API carries only
-configuration, job state, and document tracking.
-
-## Workflows
-
-A job starts in the service, which dispatches it to Batch, and the toolkit
-inside the connector container reconciles the source with the destination.
-
-### Starting and running a job
-
-A manual `StartCustomConnectorJob` call and a scheduled run go through the same
-start path. Setting a connector's `schedule` field on create or update makes CCF
-create an EventBridge Scheduler schedule for it. A scheduled run sends `{}` as
-its job configuration, so a connector that runs on a schedule needs a job
-configuration model that accepts `{}`, such as `EmptyJobConfiguration`.
-
-CCF stores the job with its encrypted configuration, and the job's DynamoDB
-stream record triggers a job orchestrator Lambda function. The orchestrator
-registers a Batch job definition that uses the framework execution role to pull
-the image and write logs, and runs the container as the connector's runtime
-role. The container receives the service endpoint, connector ID, tenant ARN
-prefix, job ID, and Region, and fetches its configuration through `CcfClient`.
-The API acts on that tenant ARN prefix only when the SigV4 caller is the
-connector's runtime role.
+Figure 1 shows the parts and the order a job uses them in.
 
 ```mermaid
-sequenceDiagram
-  participant U as Caller or schedule
-  participant C as CcfClient
-  participant A as CCF API (framework account)
-  participant S as Encrypted state (framework account)
-  participant B as Framework Batch (framework account)
-  participant R as Source-access role (client account)
-  participant D as S3 destination (framework account)
-  participant K as Amazon Bedrock
-
-  U->>C: start_custom_connector_job(job_configuration)
-  C->>A: typed SigV4 request
-  A->>S: store immutable encrypted job configuration
-  S-->>B: jobs-stream dispatch
-  B->>A: GetCustomConnector and GetCustomConnectorJob
-  B->>R: AssumeRole with connector ExternalId
-  B->>D: reconcile objects and optional sidecars
-  B-->>A: terminal Batch event
-  opt Bedrock mode and Batch succeeded
-    A->>K: StartIngestionJob
+flowchart LR
+  subgraph F[Service account]
+    API[Framework API]
+    WF[Destination workflow]
+    B[AWS Batch job]
+    Q[Ingestion queue]
   end
-  A->>S: record terminal status and release connector
+  subgraph T[Tenant account]
+    DR[Destination role]
+    ECR[Connector image repository]
+    SR[Source-access role]
+    BK[Destination bucket]
+    KB[Bedrock knowledge base]
+    LG[Connector log group]
+  end
+  SRC[Source, such as GitHub]
+  API -- 1 --> WF
+  WF -- 2 --> DR
+  DR --> BK
+  DR --> KB
+  ECR -- 3 --> B
+  B -- 4 --> SR
+  SR --> BK
+  B -- 5 --> SRC
+  B -- 6 --> LG
+  API -- 7 --> Q
+  Q --> DR
 ```
 
-_Figure 2: Starting and running a job. Solid arrows are direct calls, and dashed
-arrows are asynchronous events._
+_Figure 1: The service account runs the API, the workflows, and the jobs. Every
+resource in the tenant account is reached through a role in that account._
 
-### Fail-closed full-snapshot reconciliation
+1. You call `CreateDestination`, and the framework starts its destination
+   workflow.
+1. The workflow assumes the destination's role in your account and creates the
+   bucket and, for `BEDROCK`, the knowledge base and data source.
+1. A job starts on its schedule or when you call `StartCustomConnectorJob`.
+   AWS Batch pulls your connector image from the repository in your account.
+1. The toolkit in the container assumes the custom connector's source-access
+   role in your account. It reads the secret and writes documents to the bucket
+   with that role.
+1. Your implementation reads the source.
+1. When the custom connector has a log destination, everything the container
+   prints goes to a log group in your account.
+1. After a successful job on a `BEDROCK` destination, the framework queues an
+   ingestion request. Its consumer calls Bedrock's `StartIngestionJob` through
+   the destination's role.
 
-`documents(context)` yields the snapshot. The toolkit compares it with the
-documents recorded on the last job, then writes new and changed documents and
-deletes the ones that disappeared. Before it reads tracked state or touches the
-destination, the toolkit validates every document and spools it to a private
-disk directory, so a source failure partway through the snapshot leaves the
-destination as it was.
+## Walkthrough: from deploy to search
 
-```mermaid
-sequenceDiagram
-  participant L as Launcher
-  participant C as documents(context)
-  participant P as Framework-private disk spool
-  participant S as CCF document state
-  participant D as S3 destination
+The walkthrough uses one AWS account as both the service account and the
+tenant account. A tenant in another account follows the same steps with the
+framework's values in its configuration, as the
+[administrator guide](./docs/administrator-guide.md#deploy-a-tenant-in-another-account)
+describes.
 
-  L->>C: request complete source snapshot
-  loop every yielded Document.from_bytes()
-    C-->>L: document
-    L->>P: validate ID and duplicate, checksum, spool bytes
-  end
-  Note over L,P: An enumeration, read, validation, or spool failure<br/>removes the spool before state or destination mutation.
-  L->>S: list tracked documents with pagination
-  loop new or changed document or sidecar format
-    L->>P: rehydrate one body
-    L->>D: write object and at most one sidecar
-    opt old object or sidecar key changed
-      L->>D: delete exact old keys and preserve reused keys
-    end
-  end
-  loop tracked ID absent from snapshot
-    L->>D: delete exact object and optional sidecar
-  end
-  L->>S: record writes and deletions in bounded batches
-  L->>P: remove spool
-```
+### Prerequisites
 
-_Figure 3: Reconciling a source snapshot with the destination._
+You need these before you start:
 
-A document's checksum covers its ID, filename, metadata, and content, and
-tracked state also records the destination mode and sidecar format that wrote
-it. A rerun with no source changes writes and deletes nothing. A changed
-document, a destination-mode change, or a sidecar format change replaces the
-exact old object and sidecar.
-[`toolkit/README.md`](./toolkit/README.md#full-snapshot-behavior) covers what
-happens when a write or delete fails partway through and why a retry converges.
+- An AWS account, credentials for it in your shell, and a Region where Amazon
+  Bedrock knowledge bases are available.
+- The account and Region bootstrapped for the AWS CDK
+  (`npx cdk bootstrap aws://<account>/<region>`).
+- [uv](https://docs.astral.sh/uv/getting-started/installation/), Node.js 22 or
+  24, and the AWS CLI.
+- A running container builder. CDK uses Docker. To use
+  [Finch](https://runfinch.com/), run `export CDK_DOCKER=finch` in the shell
+  you deploy from.
+- A GitHub personal access token that can read public repositories.
 
-## Samples
+### Step 1: Install and check the code
 
-[`samples/README.md`](./samples/README.md) indexes the sample connectors:
+This step builds every project and runs its tests on your machine.
 
-- [`samples/github_connector`](./samples/github_connector) reads files, issues,
-  and pull requests from multiple GitHub repositories.
-- [`samples/gitlab_connector`](./samples/gitlab_connector) reads files, issues,
-  and merge requests from multiple GitLab projects.
-- [`samples/web_crawler`](./samples/web_crawler) reads a configured set of
-  public HTTPS HTML and PDF pages.
+1. Clone the repository and install every project:
 
-## Getting started
+   ```bash
+   git clone https://github.com/aws-samples/sample-amazon-q-business-custom-connector-framework.git
+   cd sample-amazon-q-business-custom-connector-framework
+   make install
+   ```
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and
-Node.js 22 or 24. The infrastructure is written with the
-[AWS Cloud Development Kit (AWS CDK)](https://aws.amazon.com/cdk/), and
-deploying it needs a container builder, because CDK synthesis builds the Lambda
-function bundles and the connector image. CDK uses Docker by default. To use
-[Finch](https://runfinch.com/) instead, run `export CDK_DOCKER=finch` before any
-`cdk` or `make` command. Clone the repository, then install and check every
-subproject:
+1. Run the lint, type checks, and unit tests:
+
+   ```bash
+   make check
+   ```
+
+   The command ends with exit status 0.
+
+### Step 2: Deploy the framework
+
+The framework's two stacks go into your account first, because the
+destination and connector stacks read their exports.
+
+1. Deploy the framework stacks with the default configuration:
+
+   ```bash
+   make -C framework deploy
+   ```
+
+   This deploys `CustomConnectorFramework`, then `CustomConnectorFrameworkOps`.
+   The default configuration (`framework/cdk/config/default.json`) admits only
+   the service account as a tenant and retains tables and log groups when a
+   stack is deleted.
+
+1. Subscribe to the alarm topic, so you hear about failures. The topic's ARN is
+   the `AlarmTopicArnExport` output of `CustomConnectorFrameworkOps`:
+
+   ```bash
+   aws cloudformation describe-stacks --stack-name CustomConnectorFrameworkOps \
+     --query "Stacks[0].Outputs[?OutputKey=='AlarmTopicArnExport'].OutputValue" --output text
+   ```
+
+### Step 3: Deploy the GitHub connector
+
+A connector writes into a destination: a bucket and the knowledge base that
+ingests it. The destination gets its own stack, so you can delete or replace the
+connector without losing the index. The default GitHub configuration creates
+three custom connectors, one each for the `aws-samples`, `awslabs`, and `aws`
+organizations, and reads up to 300 repositories from each. To try it with less,
+copy `connectors/github/cdk/config/example-small.json`, which reads 5
+repositories of `aws-samples`.
+
+1. Deploy the destination:
+
+   ```bash
+   make -C framework/cdk deploy DESTINATION_CONFIG=config/destination-github.json
+   ```
+
+   This deploys `CustomConnectorDestinationForGitHub`, a `BEDROCK` destination
+   named `GitHub`. The deployment waits until the destination is `ACTIVE`, which
+   can take several minutes. Note its `DestinationId` output, and set it as
+   `destination.id` in your GitHub configuration file.
+
+1. Deploy the connector:
+
+   ```bash
+   make -C connectors/github deploy CONFIG=config/<your file>.json
+   ```
+
+   `GitHubCustomConnector` builds the connector image, creates the token
+   secret, and registers one custom connector per owner, named
+   `github-<owner>`. Each gets a weekly schedule, a source-access role, and a
+   log group.
+
+1. Read the outputs you need in the next steps:
+
+   ```bash
+   aws cloudformation describe-stacks --stack-name CustomConnectorDestinationForGitHub --query "Stacks[0].Outputs"
+   aws cloudformation describe-stacks --stack-name GitHubCustomConnector --query "Stacks[0].Outputs"
+   aws cloudformation describe-stacks --stack-name CustomConnectorFramework \
+     --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" --output text
+   ```
+
+   From the destination stack, note `KnowledgeBaseId` and `DataSourceId`. From
+   `GitHubCustomConnector`, note `GitHubTokenSecretArn` and a connector ID, such
+   as `ConnectorIdawssamples` for the `aws-samples` organization. The last
+   command prints the framework's API endpoint.
+
+1. Store your GitHub token in the secret. `read -rs` keeps it out of your shell
+   history:
+
+   ```bash
+   read -rs GITHUB_TOKEN
+   aws secretsmanager put-secret-value --secret-id "<GitHubTokenSecretArn>" \
+     --secret-string "$GITHUB_TOKEN"
+   unset GITHUB_TOKEN
+   ```
+
+### Step 4: Run a job
+
+The framework API takes requests signed with AWS Signature Version 4. The
+toolkit's `CcfClient` signs them with your credentials.
+
+1. Export the values from step 3:
+
+   ```bash
+   export CCF_ENDPOINT="<ApiEndpoint>"
+   export CCF_REGION="<your Region>"
+   export DESTINATION_ID="<DestinationId>"
+   export CONNECTOR_ID="<ConnectorIdawssamples>"
+   ```
+
+1. Start a job and wait until it ends:
+
+   ```bash
+   uv run --directory framework/toolkit python - <<'EOF'
+   import os
+   import time
+
+   import boto3
+   from ccf_api_models.models import GetCustomConnectorJobRequest, StartCustomConnectorJobRequest
+   from custom_connector_framework import CcfClientSettings, create_ccf_client
+
+   client = create_ccf_client(
+       CcfClientSettings(
+           endpoint=os.environ["CCF_ENDPOINT"],
+           region=os.environ["CCF_REGION"],
+           session=boto3.Session(region_name=os.environ["CCF_REGION"]),
+       )
+   )
+   ids = {"destination_id": os.environ["DESTINATION_ID"], "connector_id": os.environ["CONNECTOR_ID"]}
+   job = client.start_custom_connector_job(StartCustomConnectorJobRequest(**ids)).job
+   print("started", job.job_id)
+   while True:
+       job = client.get_custom_connector_job(GetCustomConnectorJobRequest(**ids, job_id=job.job_id)).job
+       if job.status in ("SUCCEEDED", "FAILED", "STOPPED"):
+           print(job.status, job.status_reason or "")
+           break
+       time.sleep(30)
+   EOF
+   ```
+
+   The job reads each repository's archive, so the first run of a large
+   organization takes a while. It prints `SUCCEEDED` when it ends.
+
+1. If the job prints `FAILED`, its `status_reason` says why. For a failure in
+   the connector code, it names the log group and stream to read, for example
+   `ConnectorImplementationError: see log group /ccf/connectors/github-aws-samples, stream ccj-0fdef5d64630`.
+   Read the stream with:
+
+   ```bash
+   aws logs tail /ccf/connectors/github-aws-samples --log-stream-names "<job ID>"
+   ```
+
+   The GitHub configuration turns on log delivery by default. Without a log
+   destination, nothing the container prints is kept. The
+   [administrator guide](./docs/administrator-guide.md#troubleshoot-a-failed-job)
+   lists every `status_reason`.
+
+### Step 5: Search the knowledge base
+
+A successful job ends with the framework asking Bedrock to index the new
+documents, so search works once that ingestion finishes.
+
+1. Check that the ingestion finished:
+
+   ```bash
+   aws bedrock-agent list-ingestion-jobs --knowledge-base-id "<KnowledgeBaseId>" \
+     --data-source-id "<DataSourceId>" --query "ingestionJobSummaries[0].status"
+   ```
+
+   The command prints `"COMPLETE"` when the documents are indexed.
+
+1. Search the indexed documents with `Retrieve`:
+
+   ```bash
+   aws bedrock-agent-runtime retrieve --knowledge-base-id "<KnowledgeBaseId>" \
+     --retrieval-query '{"text": "Step Functions workflow that calls Amazon Bedrock"}' \
+     --query "retrievalResults[].{score: score, uri: metadata.source_uri}"
+   ```
+
+   Each result is a passage from a repository file, with its score and the
+   file's GitHub URL.
+
+### Step 6: Clean up
+
+Delete the stacks in the reverse order of the deploy, waiting for each one.
+CloudFormation refuses to delete a stack whose exports another stack still
+imports.
 
 ```bash
-git clone https://github.com/aws-samples/sample-custom-connector-framework-for-knowledge-bases.git
-cd sample-custom-connector-framework-for-knowledge-bases
-make install
-make check
+for stack in GitHubCustomConnector CustomConnectorDestinationForGitHub CustomConnectorFrameworkOps CustomConnectorFramework; do
+  aws cloudformation delete-stack --stack-name "$stack"
+  aws cloudformation wait stack-delete-complete --stack-name "$stack"
+done
 ```
 
-The CCF API is defined in a [Smithy](https://smithy.io/) model in
-[`api/model`](./api/model), and the build generates the OpenAPI document,
-Pydantic models, and `CcfClient` operations from it. `make install` installs the
-dependencies for `api`, `toolkit`, `backend`, `cdk`, and `samples` in dependency
-order and downloads the pinned Smithy CLI. `make check` runs lint, type checks,
-and unit tests in each subproject, and fails if the generated files are out of
-date with the Smithy model.
+Deleting `GitHubCustomConnector` deletes each custom connector's documents
+from the destination. `config/destination-github.json` sets `removalPolicy` to
+`RETAIN`, so deleting `CustomConnectorDestinationForGitHub` keeps the
+destination, its role, and its index. The default configurations also retain
+the framework's tables, the image repository, the token secret, and the log
+groups. The [administrator guide](./docs/administrator-guide.md#tear-down)
+lists what stays and how to delete it.
 
-To see a connector run without an AWS account, run the sample reconciliation
-tests. They drive the real launcher against fake source APIs, an in-memory S3
-client, and a fake CCF API:
+## Where to go next
 
-```bash
-make -C samples install
-uv run --directory samples pytest -p no:cacheprovider tests/test_reconciliation.py -q
-```
+Each guide covers one reader's task:
 
-[`samples/README.md`](./samples/README.md#local-verification) lists what those
-scenarios cover.
+- [docs/administrator-guide.md](./docs/administrator-guide.md): configuration,
+  deploying tenants in other accounts, roles, monitoring, troubleshooting, and
+  teardown.
+- [docs/user-guide.md](./docs/user-guide.md): the API, writing a connector
+  implementation, the document store, and checkpoints.
+- [DESIGN.md](./DESIGN.md): the glossary, components, workflows, and decisions.
 
-## Deploying this
+## Repository layout
 
-The framework deploys once per environment, and each connector gets its own
-client stack. [`cdk/README.md`](./cdk/README.md) covers the context values each
-deploy needs, what each destination mode creates, and how to deploy your own
-connector with the generic client stack.
-[The non-production Bedrock smoke test](./docs/non-production-bedrock-smoke-test.md)
-deploys the framework and the crawler client stack, runs a job, and checks
-Bedrock ingestion.
+| Path | What it holds |
+| --- | --- |
+| [`framework/`](./framework) | The framework: the [API model](./framework/api), the [Lambda backend](./framework/backend), the [toolkit](./framework/toolkit), the [CDK app and connector constructs](./framework/cdk), and the [runbooks](./framework/docs/runbooks) its alarms link to. |
+| [`connectors/github/`](./connectors/github) | The GitHub connector: its implementation and image, and the CDK app with the `GitHubCustomConnector` stack. |
+| [`docs/`](./docs) | The administrator guide and the user guide. |
 
-## Operating this
+`make install`, `make check`, `make test`, `make build`, `make fix`, and
+`make clean` at the root run the same target in `framework/`, then in
+`connectors/github/`. The root `make check` also scans the working tree with
+[gitleaks](https://github.com/gitleaks/gitleaks). `make deploy` deploys the
+framework, a destination, and the GitHub connector in that order, given
+`FRAMEWORK_CONFIG`, `DESTINATION_CONFIG`, and `GITHUB_CONFIG`.
 
-Every framework alarm links to
-[`docs/runbooks/delivery-failures.md`](./docs/runbooks/delivery-failures.md),
-which covers severity, likely causes, and safe replay for the Scheduler target,
-the DynamoDB stream that triggers the job orchestrator, and the target that
-receives terminal Batch job events.
+## Security
 
-## Project layout
-
-Each subproject has its own README:
-
-- [`api/`](./api) contains the Smithy model, the generated OpenAPI document and
-  Pydantic models, and the `CcfClient` operation generator.
-- [`toolkit/`](./toolkit) contains the connector author contract, `CcfClient`,
-  the launcher, and the private reconciliation, S3, and destination-mode
-  components.
-- [`backend/`](./backend) contains the Lambda handlers behind the CCF API and
-  their encryption, scheduling, job execution, and state access.
-- [`cdk/`](./cdk) contains the framework stack, the client image-assets
-  foundation stack, the generic client stack, and the sample app.
-- [`samples/`](./samples) contains the GitHub, GitLab, and configured-page
-  crawler definitions and local reconciliation tests.
+See [CONTRIBUTING](./CONTRIBUTING.md#security-issue-notifications) for more
+information.
 
 ## License
 
-MIT-0. See [LICENSE](./LICENSE).
+This library is licensed under the MIT-0 License. See the [LICENSE](./LICENSE)
+file.

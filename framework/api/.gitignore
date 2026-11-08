@@ -1,0 +1,8 @@
+build/
+dist/
+.venv/
+.ruff_cache/
+.mypy_cache/
+.smithy-cli/
+__pycache__/
+*.pyc

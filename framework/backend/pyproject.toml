@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "custom-connector-framework-backend"
+version = "0.1.0"
+description = "The Custom Connector Framework's control plane: stores destinations, custom connectors, jobs, collections, and documents in DynamoDB, starts the destination workflows, and runs jobs on AWS Batch."
+requires-python = ">=3.14"
+dependencies = [
+    "aws-lambda-powertools>=3.39.0,<4",
+    "pydantic>=2.14.3,<3",
+    "aws-xray-sdk>=2.16.0,<3",
+    "boto3>=1.43.126,<2",
+    "aws-encryption-sdk>=4.0.7,<5",
+    "aws-cryptographic-material-providers>=1.11.3,<2",
+    "ccf-api-models",
+    "pydantic-settings>=2.16.2,<3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-mock>=3.17.0",
+    "coverage>=7.17.2",
+    "moto[all]>=5.2.5",
+    "ruff>=0.17.4",
+    "mypy>=2.4.1",
+    "boto3-stubs[batch,bedrock-agent,dynamodb,iam,kms,s3,scheduler,sqs,stepfunctions,sts]>=1.43.126",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+extend = "../ruff.toml"
+
+[tool.ruff.lint]
+# UP042 (StrEnum) is off: the backend's finite value sets are `(str, Enum)`.
+extend-ignore = ["UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literal values and counts (PLR2004), use throwaway credentials (S105, S106),
+# assert broad failure propagation (B017), and re-raise without chaining in integration helpers (B904).
+"tests/**" = ["S101", "PLR2004", "S105", "S106", "B017", "B904"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+mypy_path = ["src"]
+# Reads pydantic-settings models, whose fields come from the environment rather than __init__ arguments.
+plugins = ["pydantic.mypy"]
+exclude = ["build/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = "--import-mode=importlib"
+pythonpath = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.uv.sources]
+ccf-api-models = { path = "../api/packages/ccf-api-models" }

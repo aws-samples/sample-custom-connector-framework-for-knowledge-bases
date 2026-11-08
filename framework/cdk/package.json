@@ -1,0 +1,40 @@
+{
+  "name": "custom-connector-framework-cdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AWS CDK app and library for the Custom Connector Framework: the CustomConnectorFramework and CustomConnectorFrameworkOps stacks, plus the constructs and export contract other projects import through lib/index.ts.",
+  "main": "lib/index.ts",
+  "types": "lib/index.ts",
+  "engines": {
+    "node": "^22 || ^24"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/jest": "30.0.0",
+    "@types/node": "22.20.5",
+    "aws-cdk": "2.1148.0",
+    "cdk-nag": "3.0.2",
+    "eslint": "10.14.0",
+    "jest": "30.5.2",
+    "jsonata": "2.2.2",
+    "prettier": "3.9.10",
+    "ts-jest": "29.4.15",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.275.0",
+    "constructs": "10.8.1"
+  }
+}

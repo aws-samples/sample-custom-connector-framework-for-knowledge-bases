@@ -1,0 +1,30 @@
+[project]
+name = "ccf-api-codegen"
+version = "2026.11.1"
+description = "The Smithy model of the Custom Connector Framework API and the code generators that build ccf-api-models from it."
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.4",
+    "mypy>=2.4.1",
+    "datamodel-code-generator>=0.91.0",
+    "pydantic>=2.14.3",
+    "pytest>=9.2.0",
+]
+
+[tool.ruff]
+extend = "../ruff.toml"
+# datamodel-codegen formats the models itself; mypy still checks them.
+extend-exclude = ["packages/ccf-api-models/src/ccf_api_models/models.py"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+mypy_path = ["codegen", "packages/ccf-api-models/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["codegen", "packages/ccf-api-models/src"]
+addopts = "-q"

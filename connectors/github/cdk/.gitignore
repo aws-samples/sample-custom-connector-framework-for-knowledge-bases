@@ -1,0 +1,10 @@
+node_modules/
+cdk.out/
+coverage/
+.venv/
+.pytest_cache/
+*.d.ts
+*.js
+!jest.config.js
+!eslint.config.mjs
+.DS_Store

@@ -1,0 +1,18 @@
+# Read by `make scan-secrets` (`gitleaks dir .`). Keep gitleaks' default rules and skip
+# git-ignored build output and downloaded dependencies, which a synth or install
+# regenerates and which never reach the repository.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Git-ignored build output and dependencies"
+paths = [
+  '''(^|/)cdk\.out/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.smithy-cli/''',
+  '''(^|/)\.mypy_cache/''',
+  '''(^|/)\.ruff_cache/''',
+  '''(^|/)\.pytest_cache/''',
+  '''(^|/)__pycache__/''',
+]

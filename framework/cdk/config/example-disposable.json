@@ -1,0 +1,8 @@
+{
+  "removalPolicy": "DESTROY",
+  "allowedTenantAccountIds": ["111122223333"],
+  "apiThrottling": { "rateLimit": 20, "burstLimit": 40 },
+  "deletionProtectionThreshold": 100,
+  "logRetentionDays": 7,
+  "costCenter": "ccf-dev"
+}
