@@ -33,6 +33,7 @@ REQUEST = SetMetadataFieldsRequest(
 KNOWLEDGE_BASE = {
     "name": "ccf-dst-7c41e9a2b5d0",
     "roleArn": KNOWLEDGE_BASE_ROLE_ARN,
+    "description": "Set in the console",
     "knowledgeBaseConfiguration": {
         "type": "MANAGED",
         "managedKnowledgeBaseConfiguration": {"embeddingModelType": "MANAGED"},
@@ -106,10 +107,20 @@ def test_set_fields_sends_the_knowledge_bases_own_settings_back_with_the_fields(
             "knowledgeBaseId": "KB12345678",
             "name": KNOWLEDGE_BASE["name"],
             "roleArn": KNOWLEDGE_BASE_ROLE_ARN,
+            "description": "Set in the console",
             "knowledgeBaseConfiguration": KNOWLEDGE_BASE["knowledgeBaseConfiguration"],
             "metadataConfigurations": [{"name": "owner", "type": "STRING", "searchability": "ENABLED"}],
         }
     ]
+
+
+def test_set_fields_sends_no_description_for_a_knowledge_base_without_one(monkeypatch: pytest.MonkeyPatch) -> None:
+    recording = bedrock(monkeypatch)
+    monkeypatch.delitem(KNOWLEDGE_BASE, "description")
+
+    dao(FakeSts()).set_fields(REQUEST)
+
+    assert "description" not in recording.updates[0]
 
 
 def test_set_fields_with_none_sends_an_empty_list(monkeypatch: pytest.MonkeyPatch) -> None:

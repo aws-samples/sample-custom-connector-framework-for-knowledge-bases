@@ -76,7 +76,7 @@ export class OperationsDashboard extends Construct {
     });
     dashboard.addWidgets(
       new TextWidget({
-        markdown: `# Custom Connector Framework\n\nEvery alarm links to its section of \`${DELIVERY_RUNBOOK}\`.`,
+        markdown: `# Custom Connector Framework\n\nEvery alarm links to its section of the [runbook](${DELIVERY_RUNBOOK}).`,
         width: FULL_WIDTH,
         height: 2,
       }),

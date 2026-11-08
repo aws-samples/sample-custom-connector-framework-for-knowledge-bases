@@ -33,7 +33,7 @@ os.environ.setdefault("AWS_REGION", "us-east-1")
 
 REGION = "us-east-1"
 TABLES = TablesContract.load()
-ENV_EXAMPLE = Path(__file__).resolve().parents[4] / ".env.example"
+ENV_EXAMPLE = Path(__file__).resolve().parents[3] / ".env.example"
 _SCHEMAS = OpenApiDocument.model_validate_json(
     files("ccf_api_models").joinpath("openapi.json").read_bytes()
 ).components.schemas

@@ -157,7 +157,7 @@ describe("destination app", () => {
     account: ACCOUNT,
     region: REGION,
     config: loadDestinationAppConfig({
-      path: resolve(__dirname, "..", "config", "destination-github.json"),
+      path: resolve(__dirname, "fixtures", "destination.json"),
     }),
   });
 

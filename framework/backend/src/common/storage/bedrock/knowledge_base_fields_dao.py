@@ -1,7 +1,8 @@
 """Sets a knowledge base's custom metadata fields in the tenant's account through its `CcfDestinationRole`.
 
-Bedrock takes the fields only on `UpdateKnowledgeBase`, which also requires the knowledge base's name, role, and
-configuration. The call reads them with `GetKnowledgeBase` and sends them back unchanged, with the new fields.
+Bedrock takes the fields only on `UpdateKnowledgeBase`, which replaces every member it changes: an omitted description
+is cleared. The call reads the knowledge base with `GetKnowledgeBase` and sends back its name, role, description, and
+configuration with the new fields. A managed knowledge base has no storage configuration to send.
 """
 
 from __future__ import annotations
@@ -23,6 +24,9 @@ from common.errors import (
 from common.tenant_role_clients import AssumeTenantRoleRequest, TenantRoleClients
 
 _ACTION = "Knowledge base metadata fields update"
+_KEPT_MEMBERS = ("name", "roleArn", "description", "knowledgeBaseConfiguration")
+"""The `GetKnowledgeBase` members the update sends back as they are; a knowledge base without a description has no
+`description` member."""
 
 
 class SetMetadataFieldsRequest(ValueModel):
@@ -61,9 +65,7 @@ class KnowledgeBaseFieldsDao:
             current: Any = bedrock.get_knowledge_base(knowledgeBaseId=request.knowledge_base_id)["knowledgeBase"]
             bedrock.update_knowledge_base(
                 knowledgeBaseId=request.knowledge_base_id,
-                name=current["name"],
-                roleArn=current["roleArn"],
-                knowledgeBaseConfiguration=current["knowledgeBaseConfiguration"],
+                **{member: current[member] for member in _KEPT_MEMBERS if member in current},
                 metadataConfigurations=[
                     {"name": field.name, "type": field.type.value, "searchability": field.searchability.value}
                     for field in request.fields

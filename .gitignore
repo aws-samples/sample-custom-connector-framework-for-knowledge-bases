@@ -95,3 +95,9 @@ temp/
 .localstack/
 
 .kiro
+# Reports that agent workflows write into the repository
+.agents/
+
+# The documentation site that `zensical build` writes, and its build cache
+/site/
+/.cache/

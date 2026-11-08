@@ -16,7 +16,7 @@ export enum DestinationOutput {
   ROLE_ARN = "DestinationRoleArn",
 }
 
-/** The outputs another stack imports, such as the MCP stack's knowledge base ID. */
+/** The outputs another stack imports, such as an application stack that needs the knowledge base ID. */
 const EXPORTED_OUTPUTS: ReadonlySet<DestinationOutput> = new Set([
   DestinationOutput.DESTINATION_ID,
   DestinationOutput.BUCKET_NAME,

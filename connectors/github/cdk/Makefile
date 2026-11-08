@@ -3,7 +3,7 @@
 # repository root.
 # `check` is the non-mutating gate; `fix` is its mutating counterpart.
 
-.PHONY: install build fix check test deploy clean
+.PHONY: install build fix check test deploy deploy-destination clean
 
 JEST_ARGS ?=
 # The npm workspace root, which owns the one lockfile and node_modules shared with the other CDK apps.
@@ -48,8 +48,14 @@ check: $(PACKAGED_OPENAPI)
 test: $(PACKAGED_OPENAPI)
 	npm test -- $(JEST_ARGS)
 
-# The one stack references an existing destination, so a CustomConnectorDestinationFor<Name> stack
-# deploys first (make -C ../../../framework/cdk deploy DESTINATION_CONFIG=...).
+# The connector stack references an existing destination, so the destination stack deploys first:
+# make deploy-destination. Its settings are in DESTINATION_CONFIG, relative to this directory.
+DESTINATION_CONFIG ?= config/destination.json
+
+deploy-destination: $(PACKAGED_OPENAPI)
+	$(NODE_GUARD)
+	npx cdk deploy --all --context destinationConfig=$(DESTINATION_CONFIG)
+
 deploy: $(PACKAGED_OPENAPI)
 	$(NODE_GUARD)
 	npx cdk deploy GitHubCustomConnector $(CDK_CONTEXT)

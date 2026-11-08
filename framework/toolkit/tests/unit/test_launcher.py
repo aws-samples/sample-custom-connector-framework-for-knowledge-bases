@@ -244,7 +244,7 @@ def test_a_malformed_container_variable_exits_with_the_implementation_error_code
 
 
 def test_env_example_lists_every_job_container_setting_with_a_valid_example(monkeypatch: pytest.MonkeyPatch) -> None:
-    example = TOOLKIT.parents[1] / ".env.example"
+    example = TOOLKIT.parent / ".env.example"
     lines = example.read_text().splitlines()
     values = dict(line.split("=", 1) for line in lines if line.strip() and not line.startswith("#"))
     aliases = {str(field.validation_alias) for field in RuntimeSettings.model_fields.values()}

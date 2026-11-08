@@ -16,7 +16,7 @@ from common.settings import (
     ScheduledStartSettings,
 )
 
-ENV_EXAMPLE = Path(__file__).resolve().parents[5] / ".env.example"
+ENV_EXAMPLE = Path(__file__).resolve().parents[4] / ".env.example"
 EXAMPLE = dict(
     line.split("=", 1) for line in ENV_EXAMPLE.read_text().splitlines() if line.strip() and not line.startswith("#")
 )

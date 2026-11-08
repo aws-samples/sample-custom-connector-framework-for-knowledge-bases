@@ -137,17 +137,20 @@ class DestinationCalls:
                 return CompletionResponse(is_complete=False)
 
     def _with_fields(self, check: _FieldsCheck) -> CompletionResponse[DestinationAttributes]:
-        """Set the fields when they differ; the knowledge base still applying an earlier update means not yet."""
+        """Set the fields when they differ in more than order. The knowledge base still applying an earlier update,
+        a throttle, or an unavailable service means not yet: the next poll tries again."""
         destination, fields = check.destination, check.event.resource_properties.fields()
-        if destination.metadata_fields != fields:
+        if _by_name(destination.metadata_fields) != _by_name(fields):
             try:
                 self._api.call(
                     UpdateDestinationRequest(destination_id=destination.destination_id, metadata_fields=fields)
                 )
             except CcfApiError as error:
-                if error.code is ErrorCode.CONFLICT:
-                    return CompletionResponse(is_complete=False)
-                raise
+                match error.code:
+                    case ErrorCode.CONFLICT | ErrorCode.THROTTLED | ErrorCode.SERVICE_UNAVAILABLE:
+                        return CompletionResponse(is_complete=False)
+                    case _:
+                        raise
         return CompletionResponse(is_complete=True, data=DestinationAttributes.from_destination(destination))
 
     def is_gone(self, event: DestinationEvent) -> bool:
@@ -159,6 +162,11 @@ class DestinationCalls:
 
     def _read(self, event: DestinationEvent) -> Destination:
         return self._api.call(GetDestinationRequest(destination_id=event.existing_id())).destination
+
+
+def _by_name(fields: list[MetadataField]) -> dict[str, MetadataField]:
+    """The fields keyed by name, so two lists that differ only in order compare equal."""
+    return {field.name: field for field in fields}
 
 
 _SETTINGS = ConnectorOpsSettings()

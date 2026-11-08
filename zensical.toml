@@ -1,0 +1,113 @@
+[project]
+site_name = "Custom Connector Framework"
+site_url = "https://aws-samples.github.io/sample-custom-connector-framework-for-knowledge-bases/"
+site_description = "The Custom Connector Framework (CCF) is an open source AWS sample that simplifies building, running, and operating document ingestion from any document source into Amazon Bedrock knowledge bases, AWS Quick, or Amazon S3, with an example connector that indexes GitHub organizations."
+site_author = "Jed Lechner - Sr. Specialist Solutions Architect, AWS"
+repo_name = "aws-samples/sample-custom-connector-framework-for-knowledge-bases"
+repo_url = "https://github.com/aws-samples/sample-custom-connector-framework-for-knowledge-bases"
+edit_uri = "edit/main/docs/"
+copyright = "© Amazon Web Services, Inc. or its affiliates. All rights reserved."
+extra_css = ["assets/stylesheets/custom.css"]
+nav = [
+    { Home = "index.md" },
+    { "Getting started" = [
+        { "How it works" = "getting-started/how-it-works.md" },
+        { "Tutorial: index GitHub organizations" = "getting-started/tutorial.md" },
+    ] },
+    { "Administrator Guide" = [
+        "administrator-guide/index.md",
+        { "Configure the service" = "administrator-guide/configuration.md" },
+        { "Deploy the service" = "administrator-guide/deployment.md" },
+        { "Onboard tenant accounts" = "administrator-guide/tenant-accounts.md" },
+        { "Security" = "administrator-guide/security.md" },
+        { "Monitoring" = "administrator-guide/monitoring.md" },
+        { "Runbook: delivery failures" = "administrator-guide/runbook-delivery-failures.md" },
+        { "Upgrade and tear down" = "administrator-guide/upgrade-and-tear-down.md" },
+        { "Quotas and limits" = "administrator-guide/quotas.md" },
+    ] },
+    { "Developer Guide" = [
+        "developer-guide/index.md",
+        { "Concepts" = "developer-guide/concepts.md" },
+        { "Create a destination" = "developer-guide/destinations.md" },
+        { "Write a connector implementation" = "developer-guide/connector-implementation.md" },
+        { "Store documents and checkpoints" = "developer-guide/document-store.md" },
+        { "Deploy a connector" = "developer-guide/deploy-a-connector.md" },
+        { "Roles in your account" = "developer-guide/tenant-roles.md" },
+        { "Search your documents" = "developer-guide/search.md" },
+        { "Troubleshoot a job" = "developer-guide/troubleshooting.md" },
+        { "Clients without the toolkit" = "developer-guide/clients-without-the-toolkit.md" },
+    ] },
+    { "API Reference" = [
+        "api-reference/index.md",
+        { "Operations" = "api-reference/operations.md" },
+        { "Errors" = "api-reference/errors.md" },
+    ] },
+    { "GitHub connector" = [
+        "github-connector/index.md",
+        { "Configuration" = "github-connector/configuration.md" },
+        { "Operations runbook" = "github-connector/operations.md" },
+    ] },
+    { "Architecture" = [
+        "architecture/index.md",
+        { "Workflows" = "architecture/workflows.md" },
+        { "Design decisions" = "architecture/design-decisions.md" },
+        { "Glossary" = "architecture/glossary.md" },
+    ] },
+    { Blog = [
+        "blog/index.md",
+        { "Bring any source into AWS Quick" = "blog/aws-quick.md" },
+        { "Build a custom connector for any source" = "blog/build-a-connector.md" },
+        { "Inside the GitHub connector" = "blog/github-connector.md" },
+        { "Let Strands Agents find existing code" = "blog/strands-agents.md" },
+    ] },
+]
+
+[project.theme]
+custom_dir = "overrides"
+logo = "assets/images/logo.svg"
+favicon = "assets/images/logo.png"
+features = [
+    # Top-level sections as tabs, their pages in the left sidebar, and section index pages.
+    "navigation.tabs",
+    "navigation.sections",
+    "navigation.indexes",
+    # Previous and Next links at the bottom of each page, in nav order.
+    "navigation.footer",
+    "navigation.top",
+    # The page's table of contents follows the reader's position.
+    "toc.follow",
+    "search.highlight",
+    "content.code.copy",
+]
+
+# Declaring any markdown_extensions table replaces Zensical's default extension
+# list, so the defaults are listed here in full. Without them, fenced code
+# blocks, admonitions, and tabs render as plain text.
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.def_list]
+[project.markdown_extensions.footnotes]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.tables]
+[project.markdown_extensions.toc]
+permalink = true
+[project.markdown_extensions.pymdownx.betterem]
+[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.keys]
+[project.markdown_extensions.pymdownx.magiclink]
+[project.markdown_extensions.pymdownx.mark]
+[project.markdown_extensions.pymdownx.smartsymbols]
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [{ name = "mermaid", class = "mermaid" }]
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+combine_header_slug = true
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+[project.markdown_extensions.pymdownx.tilde]

@@ -5,6 +5,7 @@
   "metadataFields": [
     { "name": "owner", "type": "STRING", "searchability": "ENABLED" },
     { "name": "repository", "type": "STRING", "searchability": "ENABLED" },
+    { "name": "repository_id", "type": "STRING", "searchability": "ENABLED" },
     { "name": "path", "type": "STRING", "searchability": "ENABLED" },
     { "name": "title", "type": "STRING", "searchability": "ENABLED" }
   ],

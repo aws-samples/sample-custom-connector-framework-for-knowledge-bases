@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <title>Custom Connector Framework</title>
+  <desc>The Custom Connector Framework logo: blue source nodes on an orbit, each with a spoke into one green hub, and one spoke that carries the result out, on a deep blue rounded square.</desc>
+  <defs>
+    <linearGradient id="ccf-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="ccf-source" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7DB9FF"/>
+      <stop offset="1" stop-color="#3B8DF5"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-0" x1="22.0" y1="60.0" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-1" x1="35.8" y1="31.6" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-2" x1="35.8" y1="88.4" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-3" x1="66.7" y1="25.1" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-4" x1="66.7" y1="94.9" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-hub" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#8BF0AE"/>
+      <stop offset="1" stop-color="#22C3B0"/>
+    </linearGradient>
+    <linearGradient id="ccf-delivery" x1="70" y1="0" x2="106" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="ccf-lift" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#06121F" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <g id="ccf-logo">
+    <rect width="120" height="120" rx="26" fill="url(#ccf-tile)"/>
+    <circle id="ccf-orbit" cx="58.0" cy="60.0" r="36.0" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12"/>
+    <g id="ccf-spokes">
+      <path d="M22.0 61.8 L58.0 64.2 L58.0 55.8 L22.0 58.2 Z" fill="url(#ccf-spoke-0)"/>
+      <path d="M34.4 32.7 L54.7 62.6 L61.3 57.4 L37.3 30.5 Z" fill="url(#ccf-spoke-1)"/>
+      <path d="M37.3 89.5 L61.3 62.6 L54.7 57.4 L34.4 87.3 Z" fill="url(#ccf-spoke-2)"/>
+      <path d="M65.0 24.6 L53.9 59.0 L62.1 61.0 L68.5 25.5 Z" fill="url(#ccf-spoke-3)"/>
+      <path d="M68.5 94.5 L62.1 59.0 L53.9 61.0 L65.0 95.4 Z" fill="url(#ccf-spoke-4)"/>
+    </g>
+    <path id="ccf-delivery-spoke" d="M70 55 L101 55 A5 5 0 0 1 101 65 L70 65 Z" fill="url(#ccf-delivery)"/>
+    <g id="ccf-sources" fill="url(#ccf-source)" filter="url(#ccf-lift)">
+      <circle cx="22.0" cy="60.0" r="6.5"/>
+      <circle cx="35.8" cy="31.6" r="6.5"/>
+      <circle cx="35.8" cy="88.4" r="6.5"/>
+      <circle cx="66.7" cy="25.1" r="6.5"/>
+      <circle cx="66.7" cy="94.9" r="6.5"/>
+    </g>
+    <g id="ccf-hub-node" filter="url(#ccf-lift)">
+      <circle cx="58.0" cy="60.0" r="15" fill="url(#ccf-hub)"/>
+      <circle cx="58.0" cy="60.0" r="5.5" fill="#0D3550"/>
+    </g>
+  </g>
+</svg>

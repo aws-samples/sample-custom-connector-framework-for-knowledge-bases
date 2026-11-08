@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 790" width="1000" height="790">
+  <title>Architecture: how a job keeps a knowledge base current</title>
+  <desc>Inside one AWS Region, the service account runs the framework API on Amazon API Gateway and AWS Lambda, Amazon EventBridge Scheduler, the AWS Step Functions job workflow, AWS Batch, Amazon DynamoDB, and the Amazon SQS ingestion queue. The tenant account holds the connector image in Amazon ECR, the Amazon S3 destination bucket, the Amazon Bedrock knowledge base, and AWS Quick. Numbered steps show a job pulling its image, reading the source, such as GitHub, writing changed files to the bucket, and the framework then starting ingestion.</desc>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4A4A4A"/>
+    </marker>
+    <!-- Logo definitions, copied from docs/assets/images/logo.svg. -->
+    <linearGradient id="ccf-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1F3A"/>
+      <stop offset="1" stop-color="#0E4A5C"/>
+    </linearGradient>
+    <linearGradient id="ccf-source" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7DB9FF"/>
+      <stop offset="1" stop-color="#3B8DF5"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-0" x1="22.0" y1="60.0" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-1" x1="35.8" y1="31.6" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-2" x1="35.8" y1="88.4" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-3" x1="66.7" y1="25.1" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-spoke-4" x1="66.7" y1="94.9" x2="58.0" y2="60.0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F9DFF"/>
+      <stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="ccf-hub" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0" stop-color="#8BF0AE"/>
+      <stop offset="1" stop-color="#22C3B0"/>
+    </linearGradient>
+    <linearGradient id="ccf-delivery" x1="70" y1="0" x2="106" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#7EE8A2"/>
+    </linearGradient>
+    <filter id="ccf-lift" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#06121F" flood-opacity="0.55"/>
+    </filter>
+    <linearGradient id="ccf-wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1F6FD1"/>
+      <stop offset="1" stop-color="#11998A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="790" fill="#FFFFFF"/>
+  <text x="10" y="44" font-family="Helvetica" font-size="26" fill="#1F1F1F">Architecture: how a job keeps a knowledge base current</text>
+  <g id="ccf-lockup" transform="translate(770,10)">
+    <g id="ccf-logo" transform="scale(0.4000)">
+      <rect width="120" height="120" rx="26" fill="url(#ccf-tile)"/>
+      <circle id="ccf-orbit" cx="58.0" cy="60.0" r="36.0" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="12"/>
+      <g id="ccf-spokes">
+        <path d="M22.0 61.8 L58.0 64.2 L58.0 55.8 L22.0 58.2 Z" fill="url(#ccf-spoke-0)"/>
+        <path d="M34.4 32.7 L54.7 62.6 L61.3 57.4 L37.3 30.5 Z" fill="url(#ccf-spoke-1)"/>
+        <path d="M37.3 89.5 L61.3 62.6 L54.7 57.4 L34.4 87.3 Z" fill="url(#ccf-spoke-2)"/>
+        <path d="M65.0 24.6 L53.9 59.0 L62.1 61.0 L68.5 25.5 Z" fill="url(#ccf-spoke-3)"/>
+        <path d="M68.5 94.5 L62.1 59.0 L53.9 61.0 L65.0 95.4 Z" fill="url(#ccf-spoke-4)"/>
+      </g>
+      <path id="ccf-delivery-spoke" d="M70 55 L101 55 A5 5 0 0 1 101 65 L70 65 Z" fill="url(#ccf-delivery)"/>
+      <g id="ccf-sources" fill="url(#ccf-source)" filter="url(#ccf-lift)">
+        <circle cx="22.0" cy="60.0" r="6.5"/>
+        <circle cx="35.8" cy="31.6" r="6.5"/>
+        <circle cx="35.8" cy="88.4" r="6.5"/>
+        <circle cx="66.7" cy="25.1" r="6.5"/>
+        <circle cx="66.7" cy="94.9" r="6.5"/>
+      </g>
+      <g id="ccf-hub-node" filter="url(#ccf-lift)">
+        <circle cx="58.0" cy="60.0" r="15" fill="url(#ccf-hub)"/>
+        <circle cx="58.0" cy="60.0" r="5.5" fill="#0D3550"/>
+      </g>
+    </g>
+    <text x="58" y="21" font-family="Helvetica" font-size="17" font-weight="bold" fill="#0B1F3A">Custom Connector</text>
+    <text x="58" y="42" font-family="Helvetica" font-size="17" font-weight="bold" fill="url(#ccf-wordmark)">Framework</text>
+  </g>
+
+  <g id="aws-cloud">
+    <rect x="10" y="70" width="810" height="630" fill="none" stroke="#232F3E" stroke-width="1.5"/>
+    <use href="icon:aws/aws-cloud-logo" x="10" y="70" width="30" height="30"/>
+    <text x="48" y="91" font-family="Helvetica" font-size="17" fill="#232F3E">AWS Cloud</text>
+  </g>
+  <g id="region">
+    <rect x="25" y="110" width="780" height="575" fill="none" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <use href="icon:aws/region" x="25" y="110" width="26" height="26"/>
+    <text x="58" y="129" font-family="Helvetica" font-size="17" fill="#00777A">AWS Region</text>
+  </g>
+  <g id="service-account">
+    <rect x="40" y="150" width="600" height="310" rx="8" fill="#FFFFFF" stroke="#E7157B" stroke-width="1.5"/>
+    <use href="icon:aws/aws-account" x="40" y="150" width="28" height="28"/>
+    <text x="76" y="170" font-family="Helvetica" font-size="17" fill="#B0105D">CCF service account</text>
+  </g>
+  <g id="tenant-account">
+    <rect x="190" y="500" width="600" height="170" rx="8" fill="#FFFFFF" stroke="#E7157B" stroke-width="1.5"/>
+    <use href="icon:aws/aws-account" x="190" y="500" width="28" height="28"/>
+    <text x="226" y="520" font-family="Helvetica" font-size="17" fill="#B0105D">Tenant account</text>
+  </g>
+  <g id="source">
+    <rect x="840" y="150" width="150" height="160" rx="8" fill="none" stroke="#7D8998" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="856" y="174" font-family="Helvetica" font-size="17" fill="#5A6573">Source</text>
+  </g>
+
+  <g id="api-gateway">
+    <rect x="55" y="200" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-api-gateway" x="91" y="208" width="48" height="48"/>
+    <text x="115" y="274" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Amazon API</text>
+    <text x="115" y="292" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Gateway</text>
+  </g>
+  <g id="lambda">
+    <rect x="205" y="200" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/aws-lambda" x="241" y="208" width="48" height="48"/>
+    <text x="265" y="274" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">AWS Lambda</text>
+    <text x="265" y="292" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">framework API</text>
+  </g>
+  <g id="step-functions">
+    <rect x="355" y="200" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/aws-step-functions" x="391" y="208" width="48" height="48"/>
+    <text x="415" y="274" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">AWS Step</text>
+    <text x="415" y="292" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Functions</text>
+  </g>
+  <g id="batch">
+    <rect x="505" y="200" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/aws-batch" x="541" y="208" width="48" height="48"/>
+    <text x="565" y="274" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">AWS Batch</text>
+    <text x="565" y="292" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">your connector</text>
+  </g>
+  <g id="scheduler">
+    <rect x="55" y="340" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-eventbridge-scheduler" x="91" y="348" width="48" height="48"/>
+    <text x="115" y="414" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">EventBridge</text>
+    <text x="115" y="432" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Scheduler</text>
+  </g>
+  <g id="dynamodb">
+    <rect x="205" y="340" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-dynamodb" x="241" y="348" width="48" height="48"/>
+    <text x="265" y="414" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Amazon</text>
+    <text x="265" y="432" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">DynamoDB</text>
+  </g>
+  <g id="sqs">
+    <rect x="355" y="340" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-simple-queue-service" x="391" y="348" width="48" height="48"/>
+    <text x="415" y="414" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Amazon SQS</text>
+    <text x="415" y="432" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">ingestion queue</text>
+  </g>
+  <g id="github">
+    <rect x="855" y="190" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:lucide/git-branch" x="891" y="198" width="48" height="48" color="#1F1F1F"/>
+    <text x="915" y="264" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">GitHub</text>
+    <text x="915" y="282" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">the example</text>
+  </g>
+  <g id="quick">
+    <rect x="205" y="550" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-quick" x="241" y="558" width="48" height="48"/>
+    <text x="265" y="624" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">AWS Quick</text>
+    <text x="265" y="642" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">or your agents</text>
+  </g>
+  <g id="knowledge-base">
+    <rect x="355" y="550" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-bedrock" x="391" y="558" width="48" height="48"/>
+    <text x="415" y="624" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#1F1F1F">Amazon Bedrock</text>
+    <text x="415" y="642" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">knowledge base</text>
+  </g>
+  <g id="s3">
+    <rect x="505" y="550" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-simple-storage-service" x="541" y="558" width="48" height="48"/>
+    <text x="565" y="624" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Amazon S3</text>
+    <text x="565" y="642" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">destination</text>
+  </g>
+  <g id="ecr">
+    <rect x="655" y="550" width="120" height="100" rx="8" fill="#F8F9FA" stroke="#4A4A4A"/>
+    <use href="icon:aws/amazon-elastic-container-registry" x="691" y="558" width="48" height="48"/>
+    <text x="715" y="624" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#1F1F1F">Amazon ECR</text>
+    <text x="715" y="642" font-family="Helvetica" font-size="15" text-anchor="middle" fill="#3A3A3A">connector image</text>
+  </g>
+
+  <g id="flow-1-api">
+    <line x1="175" y1="250" x2="203" y2="250" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="190" cy="228" r="11" fill="#232F3E"/>
+    <text x="190" y="233" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">1</text>
+  </g>
+  <g id="flow-1-schedule">
+    <line x1="175" y1="352" x2="216" y2="304" stroke="#4A4A4A" stroke-width="2" stroke-dasharray="3 6" marker-end="url(#head)"/>
+    <circle cx="184" cy="318" r="11" fill="#232F3E"/>
+    <text x="184" y="323" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">1</text>
+  </g>
+  <g id="job-record">
+    <line x1="265" y1="300" x2="265" y2="338" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+  </g>
+  <g id="flow-2">
+    <line x1="325" y1="250" x2="353" y2="250" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="340" cy="228" r="11" fill="#232F3E"/>
+    <text x="340" y="233" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">2</text>
+  </g>
+  <g id="flow-3">
+    <line x1="475" y1="250" x2="503" y2="250" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="490" cy="228" r="11" fill="#232F3E"/>
+    <text x="490" y="233" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">3</text>
+  </g>
+  <g id="flow-4">
+    <line x1="625" y1="292" x2="709" y2="547" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="668" cy="422" r="11" fill="#232F3E"/>
+    <text x="668" y="427" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">4</text>
+    <text x="688" y="420" font-family="Helvetica" font-size="16" fill="#3A3A3A">Pull the</text>
+    <text x="688" y="438" font-family="Helvetica" font-size="16" fill="#3A3A3A">image</text>
+  </g>
+  <g id="flow-5">
+    <line x1="625" y1="240" x2="853" y2="240" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="730" cy="218" r="11" fill="#232F3E"/>
+    <text x="730" y="223" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">5</text>
+    <text x="730" y="266" font-family="Helvetica" font-size="16" text-anchor="middle" fill="#3A3A3A">Read the source</text>
+  </g>
+  <g id="flow-6">
+    <line x1="565" y1="300" x2="565" y2="548" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="565" cy="366" r="11" fill="#232F3E"/>
+    <text x="565" y="371" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">6</text>
+    <text x="580" y="400" font-family="Helvetica" font-size="16" fill="#3A3A3A">Write</text>
+    <text x="580" y="418" font-family="Helvetica" font-size="16" fill="#3A3A3A">files</text>
+  </g>
+  <g id="flow-7">
+    <line x1="415" y1="300" x2="415" y2="338" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="437" cy="319" r="11" fill="#232F3E"/>
+    <text x="437" y="324" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">7</text>
+  </g>
+  <g id="flow-8">
+    <line x1="415" y1="440" x2="415" y2="548" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="415" cy="480" r="11" fill="#232F3E"/>
+    <text x="415" y="485" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">8</text>
+    <text x="433" y="477" font-family="Helvetica" font-size="16" fill="#3A3A3A">Start</text>
+    <text x="433" y="495" font-family="Helvetica" font-size="16" fill="#3A3A3A">ingestion</text>
+  </g>
+  <g id="index-bucket">
+    <line x1="505" y1="600" x2="477" y2="600" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+  </g>
+  <g id="flow-9">
+    <line x1="325" y1="600" x2="353" y2="600" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <circle cx="340" cy="578" r="11" fill="#232F3E"/>
+    <text x="340" y="583" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">9</text>
+  </g>
+
+  <g id="legend">
+    <rect x="10" y="720" width="980" height="56" rx="8" fill="#FFFFFF" stroke="#C8C8C8"/>
+    <circle cx="36" cy="748" r="11" fill="#232F3E"/>
+    <text x="36" y="753" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#FFFFFF">1</text>
+    <text x="56" y="754" font-family="Helvetica" font-size="17" fill="#3A3A3A">Order of a job's steps</text>
+    <line x1="260" y1="748" x2="305" y2="748" stroke="#4A4A4A" stroke-width="2" marker-end="url(#head)"/>
+    <text x="316" y="754" font-family="Helvetica" font-size="17" fill="#3A3A3A">Call or data</text>
+    <line x1="440" y1="748" x2="485" y2="748" stroke="#4A4A4A" stroke-width="2" stroke-dasharray="3 6" marker-end="url(#head)"/>
+    <text x="496" y="754" font-family="Helvetica" font-size="17" fill="#3A3A3A">Scheduled start</text>
+    <rect x="650" y="738" width="30" height="20" rx="4" fill="none" stroke="#E7157B" stroke-width="1.5"/>
+    <text x="690" y="754" font-family="Helvetica" font-size="17" fill="#3A3A3A">AWS account</text>
+    <rect x="810" y="738" width="30" height="20" fill="none" stroke="#7D8998" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="850" y="754" font-family="Helvetica" font-size="17" fill="#3A3A3A">Outside AWS</text>
+  </g>
+</svg>

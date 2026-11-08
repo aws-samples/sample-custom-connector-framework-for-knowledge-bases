@@ -87,16 +87,16 @@ describe("parseDestinationAppConfig", () => {
 });
 
 describe("loadDestinationAppConfig", () => {
-  it("reads the checked-in GitHub destination", () => {
+  it("reads a destination configuration file", () => {
     expect(
       loadDestinationAppConfig({
-        path: resolve(__dirname, "..", "config", "destination-github.json"),
+        path: resolve(__dirname, "fixtures", "destination.json"),
       }),
     ).toMatchObject({
       name: "GitHub",
       type: "BEDROCK",
       removalPolicy: RemovalPolicy.RETAIN,
-      metadataFields: ["owner", "repository", "path", "title"].map((name) => ({
+      metadataFields: ["owner", "repository", "repository_id", "path", "title"].map((name) => ({
         name,
         type: "STRING",
         searchability: "ENABLED",

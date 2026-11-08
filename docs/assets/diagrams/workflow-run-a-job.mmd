@@ -1,0 +1,32 @@
+---
+title: "Sequence: running a job, from its start to ingestion"
+---
+sequenceDiagram
+  autonumber
+  box Service account
+    participant S as EventBridge Scheduler
+    participant A as Framework API
+    participant W as Job workflow
+    participant B as AWS Batch job
+    participant Q as Ingestion queue
+  end
+  box Tenant account
+    participant R as Source-access role
+    participant K as Destination bucket
+    participant KB as Bedrock knowledge base
+  end
+  participant G as Source
+  S->>A: Start the job on its schedule
+  Note over A: A tenant can call StartCustomConnectorJob instead
+  A->>W: Record the job STARTED, start its execution
+  W->>B: Mark the job RUNNING, submit it, and wait
+  B->>R: Assume the role with the external ID
+  B->>G: Read the source
+  B->>K: Write new and changed files
+  B->>A: Record the documents, save checkpoints
+  B-->>W: Exit 0, or 70 when the implementation raised
+  Note over W: Record SUCCEEDED or FAILED, release the custom connector
+  opt A successful job on a BEDROCK destination
+    W->>Q: Queue one ingestion request
+    Q->>KB: Start ingestion through the destination role
+  end

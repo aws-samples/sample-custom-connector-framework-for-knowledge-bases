@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block htmltitle %}
+  {% if page.meta and page.meta.title %}
+    <title>{{ page.meta.title }} - {{ config.site_name }}</title>
+  {% elif page.title and not page.is_homepage %}
+    <title>{{ page.title | striptags }} - {{ config.site_name }}</title>
+  {% else %}
+    <title>{{ config.site_name }}</title>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  {{ super() }}
+  {% if page.meta and page.meta.description %}
+    {% set social_description = page.meta.description %}
+  {% else %}
+    {% set social_description = config.site_description %}
+  {% endif %}
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="{{ config.site_name }}" />
+  <meta property="og:title" content="{{ page.title | striptags if page.title else config.site_name }}" />
+  <meta property="og:description" content="{{ social_description }}" />
+  <meta property="og:url" content="{{ page.canonical_url }}" />
+  <meta property="og:image" content="{{ config.site_url }}assets/diagrams/hero.png" />
+  <meta property="og:image:alt" content="Document sources connect through the Custom Connector Framework to Amazon Bedrock knowledge bases, AWS Quick, and Amazon S3." />
+  <meta name="twitter:card" content="summary_large_image" />
+  {% if page.is_homepage %}
+    <script type="application/ld+json">
+      {{ {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": config.site_name,
+        "url": config.site_url,
+        "description": config.site_description
+      } | tojson }}
+    </script>
+  {% endif %}
+{% endblock %}

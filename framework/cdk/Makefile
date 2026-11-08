@@ -66,17 +66,12 @@ uv run --locked --group dev mypy $(PYTHON_SOURCES) $(PYTHON_TESTS)
 uv run --locked --group dev pytest $(PYTHON_TESTS)
 endef
 
-# The Ops stack reads the service stack's exports, so the service stack deploys first. With
-# DESTINATION_CONFIG, the app holds only that destination's stack, which deploys after the framework:
-# make deploy DESTINATION_CONFIG=config/destination-github.json
+# The Ops stack reads the service stack's exports, so the service stack deploys first. A tenant's
+# destination stack deploys from its own project, for example make -C connectors/github deploy-destination.
 deploy: $(PACKAGED_OPENAPI)
 	$(NODE_GUARD)
-ifdef DESTINATION_CONFIG
-	npx cdk deploy --all --context destinationConfig=$(DESTINATION_CONFIG)
-else
 	npx cdk deploy CustomConnectorFramework $(CDK_CONTEXT)
 	npx cdk deploy CustomConnectorFrameworkOps $(CDK_CONTEXT)
-endif
 
 clean:
 	rm -rf cdk.out node_modules coverage .venv .pytest_cache

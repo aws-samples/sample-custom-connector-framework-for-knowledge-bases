@@ -4,6 +4,7 @@ import { Match, Template } from "aws-cdk-lib/assertions";
 import { loadFrameworkAppConfig } from "../lib/common/app-config";
 import { metricsContract } from "../lib/common/contracts";
 import { FrameworkExport } from "../lib/common/framework-exports";
+import { DELIVERY_RUNBOOK } from "../lib/construct-groups/service-alarms";
 import { CustomConnectorFrameworkOpsStack } from "../lib/stacks/custom-connector-framework-ops-stack";
 import { SERVICE_ACCOUNT, createApp, importedNames } from "./construct-fixtures";
 
@@ -113,15 +114,22 @@ describe("CustomConnectorFrameworkOps", () => {
 
   test("every alarm links a runbook section that exists, and notifies the topic on ALARM and OK", () => {
     const runbook = readFileSync(
-      resolve(__dirname, "..", "..", "docs", "runbooks", "delivery-failures.md"),
+      resolve(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "docs",
+        "administrator-guide",
+        "runbook-delivery-failures.md",
+      ),
       "utf8",
     );
     const sections = new Set([...runbook.matchAll(/^## ([a-z-]+)$/gm)].map((match) => match[1]));
     for (const properties of alarms) {
       const description = properties.AlarmDescription as string;
-      expect(description).toMatch(
-        /^\[P[12]\] .+ Runbook: framework\/docs\/runbooks\/delivery-failures\.md#[a-z-]+$/,
-      );
+      expect(description.startsWith("[P1] ") || description.startsWith("[P2] ")).toBe(true);
+      expect(description).toContain(` Runbook: ${DELIVERY_RUNBOOK}#`);
       expect(sections).toContain(description.split("#").pop());
       expect(properties.AlarmActions).toHaveLength(1);
       expect(properties.OKActions).toHaveLength(1);
