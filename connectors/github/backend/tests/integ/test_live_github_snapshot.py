@@ -30,6 +30,7 @@ def _live_configuration() -> GitHubConnectorConfiguration:
         update={
             "max_repositories": MAX_REPOSITORIES,
             "max_file_bytes": 104_857_600,
+            "min_file_bytes": 1,
             "github": configuration.github.model_copy(
                 update={
                     "request_interval_seconds": 1.0,

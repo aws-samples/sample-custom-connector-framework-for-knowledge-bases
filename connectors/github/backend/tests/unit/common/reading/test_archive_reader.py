@@ -10,9 +10,11 @@ from common.reading.archive_reader import ArchiveFile, ArchiveReader, ReadArchiv
 from tests.unit.fake_github import FakeRepository
 
 
-def _read(repository: FakeRepository) -> dict[str, bytes]:
+def _read(repository: FakeRepository, min_file_bytes: int = 1) -> dict[str, bytes]:
     reader = ArchiveReader(GitIgnoreSpec.from_lines(["node_modules/", "*.pyc"]))
-    files = reader.read(ReadArchiveRequest(archive=io.BytesIO(repository.tarball()), max_file_bytes=1024))
+    files = reader.read(
+        ReadArchiveRequest(archive=io.BytesIO(repository.tarball()), max_file_bytes=1024, min_file_bytes=min_file_bytes)
+    )
     return {file.path: file.content for file in files}
 
 
@@ -29,6 +31,12 @@ def test_excluded_paths_and_oversized_files_are_skipped() -> None:
     )
 
     assert _read(repository) == {"keep.md": b"keep"}
+
+
+def test_a_file_smaller_than_the_minimum_is_skipped_and_one_at_the_minimum_is_kept() -> None:
+    repository = FakeRepository("aws-samples/demo", {".python-version": b"3.13\n", "notes.md": b"x" * 32})
+
+    assert _read(repository, min_file_bytes=32) == {"notes.md": b"x" * 32}
 
 
 def test_symlinks_are_never_followed_or_yielded() -> None:
@@ -50,11 +58,21 @@ def test_each_file_carries_the_blob_sha_git_hash_object_prints() -> None:
 
 def test_skipped_files_are_logged_once_with_the_count_per_reason(caplog: pytest.LogCaptureFixture) -> None:
     reader = ArchiveReader(GitIgnoreSpec.from_lines(["*.pyc"]))
-    repository = FakeRepository("aws-samples/demo", {"a.pyc": b"x", "b.pyc": b"x", "big.txt": b"x" * 2048})
+    repository = FakeRepository(
+        "aws-samples/demo", {"a.pyc": b"x", "b.pyc": b"x", "big.txt": b"x" * 2048, "tiny.txt": b"x"}
+    )
 
     with caplog.at_level(logging.INFO):
-        list(reader.read(ReadArchiveRequest(archive=io.BytesIO(repository.tarball()), max_file_bytes=1024)))
+        list(
+            reader.read(
+                ReadArchiveRequest(archive=io.BytesIO(repository.tarball()), max_file_bytes=1024, min_file_bytes=2)
+            )
+        )
 
     [skipped] = [record for record in caplog.records if record.getMessage() == "files_skipped"]
     assert skipped.levelname == "INFO"
-    assert (skipped.__dict__["excluded_path"], skipped.__dict__["too_large"]) == (2, 1)
+    assert (skipped.__dict__["excluded_path"], skipped.__dict__["too_large"], skipped.__dict__["too_small"]) == (
+        2,
+        1,
+        1,
+    )

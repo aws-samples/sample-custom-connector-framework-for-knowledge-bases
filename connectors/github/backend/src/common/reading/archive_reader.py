@@ -29,6 +29,7 @@ class FileSkipReason(str, Enum):
 
     EXCLUDED_PATH = "excluded_path"
     TOO_LARGE = "too_large"
+    TOO_SMALL = "too_small"
 
 
 class ReadArchiveRequest(BaseModel):
@@ -37,6 +38,7 @@ class ReadArchiveRequest(BaseModel):
     archive: SkipValidation[BinaryIO]
     """The gzipped tarball, read once from start to end."""
     max_file_bytes: int
+    min_file_bytes: int
 
 
 class ArchiveFile(BaseModel):
@@ -73,6 +75,9 @@ class ArchiveReader:
                     continue
                 if member.size > request.max_file_bytes:
                     skipped[FileSkipReason.TOO_LARGE] += 1
+                    continue
+                if member.size < request.min_file_bytes:
+                    skipped[FileSkipReason.TOO_SMALL] += 1
                     continue
                 stream = archive.extractfile(member)
                 if stream is None:

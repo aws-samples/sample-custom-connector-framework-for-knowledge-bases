@@ -294,15 +294,47 @@ def test_a_failed_send_after_a_failed_run_keeps_the_implementation_error_code() 
     assert world.run(PutsThenDeletesThenRaises) is JobExitCode.CONNECTOR_IMPLEMENTATION_ERROR
 
 
-def test_the_report_line_carries_the_job_id_and_no_source_collection_id(caplog: pytest.LogCaptureFixture) -> None:
+def test_the_report_lines_carry_the_job_id_and_no_source_collection_id(caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.INFO)
 
     RunnerWorld().run(PutsIntoASourceCollection)
 
-    [reported] = [record for record in caplog.records if record.getMessage() == "job_reported"]
-    line = JsonLineFormatter(JobLogFields(job_id=JOB_ID, connector_id=CONNECTOR_ID)).format(reported)
-    assert json.loads(line)["job_id"] == JOB_ID
-    assert SOURCE_COLLECTION_ID not in line
+    formatter = JsonLineFormatter(JobLogFields(job_id=JOB_ID, connector_id=CONNECTOR_ID))
+    lines = [
+        formatter.format(record)
+        for record in caplog.records
+        if record.getMessage() in {"collection_reported", "job_reported"}
+    ]
+    assert [json.loads(line)["message"] for line in lines] == ["collection_reported", "job_reported"]
+    assert all(json.loads(line)["job_id"] == JOB_ID for line in lines)
+    assert all(SOURCE_COLLECTION_ID not in line for line in lines)
+
+
+class PutsIntoManyCollections(ConnectorImplementation):
+    def run(self) -> None:
+        for number in range(500):
+            self.store.put(
+                PutDocumentRequest(
+                    document_id=f"{number}/README.md",
+                    file_name="README.md",
+                    content=io.BytesIO(b"hi"),
+                    collection_id=str(number),
+                )
+            )
+
+
+def test_the_report_of_a_job_with_many_collections_keeps_every_line_under_16_kb(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO)
+
+    RunnerWorld().run(PutsIntoManyCollections)
+
+    formatter = JsonLineFormatter(JobLogFields(job_id=JOB_ID, connector_id=CONNECTOR_ID))
+    reported = [record for record in caplog.records if record.getMessage() in {"collection_reported", "job_reported"}]
+    assert len(reported) == 501
+    assert max(len(formatter.format(record).encode()) for record in reported) < 16 * 1024
+    assert json.loads(formatter.format(reported[-1]))["collections"] == 500
 
 
 def test_sigterm_isnt_swallowed_by_an_implementations_except_exception() -> None:

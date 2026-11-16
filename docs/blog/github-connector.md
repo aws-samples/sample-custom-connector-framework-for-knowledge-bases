@@ -44,7 +44,8 @@ Not every repository or file helps a search. The default configuration leaves ou
 - Repositories with no push in 730 days, and any after the 300 most recently pushed repositories the connector selects for an owner, set by `max_repository_age_days` and `max_repositories`.
 - Repositories generated from AWS service models, such as the AWS SDKs, the Go bindings for the AWS CDK, and the API models. They're large, documented elsewhere, and would crowd out hand-written code. `aws-cdk-go` alone is about 23 GB.
 - Build output, dependencies, binaries, and secrets, with `.gitignore`-style path patterns.
-- Files larger than `max_file_bytes`, 100 MiB by default.
+- File types Amazon Bedrock can't index even as text, such as SVG icons, PHP, and Xcode interface files, also with path patterns.
+- Files larger than `max_file_bytes`, 100 MiB by default, and smaller than `min_file_bytes`, 256 bytes by default.
 
 Each job logs how many files it left out and why, so you can tune the lists from real counts.
 

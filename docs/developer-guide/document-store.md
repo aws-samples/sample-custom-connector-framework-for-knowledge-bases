@@ -20,7 +20,7 @@ Your implementation writes everything through `self.store`, the toolkit's `Docum
 | `delete_collection(DeleteCollectionRequest)` | Deletes a collection and every document in it. |
 | `get_report()` | Returns a `StoreReport`: written, unchanged, deleted, skipped, and pending counts per collection and in total. |
 
-`put` reads the first 8 KB to detect the media type, unless you pass `media_type`. It skips empty text and content the destination can't index. When it skips a document the framework already holds, it queues a delete, so the old version doesn't stay searchable. Otherwise it writes the metadata file, then the file, and queues the record, which the store sends in batches of up to 99 per collection.
+`put` reads the first 8 KB to detect the media type, unless you pass `media_type`. It skips a document whose content is empty or only whitespace, whatever its type, and content the destination can't index. When it skips a document the framework already holds, it queues a delete, so the old version doesn't stay searchable. Otherwise it writes the metadata file, then the file, and queues the record, which the store sends in batches of up to 99 per collection.
 
 When the stored file already has the same content hash, `put` writes nothing and only refreshes the record. A job that finds no changes in the source rewrites no file, so the next ingestion has nothing new to index.
 

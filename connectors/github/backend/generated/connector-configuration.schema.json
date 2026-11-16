@@ -81,6 +81,11 @@
       "title": "Max Repository Age Days",
       "type": "integer"
     },
+    "min_file_bytes": {
+      "exclusiveMinimum": 0,
+      "title": "Min File Bytes",
+      "type": "integer"
+    },
     "owner": {
       "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
       "title": "Owner",
@@ -103,6 +108,7 @@
     "excluded_repository_patterns",
     "excluded_path_patterns",
     "max_file_bytes",
+    "min_file_bytes",
     "full_read_interval_days",
     "github"
   ],

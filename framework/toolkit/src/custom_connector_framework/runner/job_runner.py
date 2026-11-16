@@ -218,19 +218,23 @@ class JobRunner:
 
     @staticmethod
     def _report(finished: _FinishedRun) -> None:
+        """Log one line per collection, then the totals, so no line passes the log driver's 16 KB split."""
         report = finished.store.get_report()
         # Keyed by framework collection ID, so no source collection ID reaches the log.
+        for collection in report.collections:
+            logger.info(
+                "collection_reported",
+                extra={
+                    "collection_id": CollectionIdentity.of(collection.collection_id).collection_id,
+                    "counts": collection.counts.model_dump(),
+                },
+            )
         logger.info(
             "job_reported",
             extra={
                 "exit_code": finished.exit_code.value,
-                "report": {
-                    "total": report.total.model_dump(),
-                    "collections": {
-                        CollectionIdentity.of(collection.collection_id).collection_id: collection.counts.model_dump()
-                        for collection in report.collections
-                    },
-                },
+                "collections": len(report.collections),
+                "total": report.total.model_dump(),
             },
         )
 

@@ -21,18 +21,26 @@ Each line is one JSON object whose `message` is the event name, with the `job_id
 | `repository_skipped` | `repository`, `reason` `unchanged` | Its last push and the content filters match its checkpoint, so the job didn't download it |
 | `repository_read` | `repository`, `documents`, `deleted` | The job read the archive, wrote the kept files, and deleted the files that are gone |
 | `archive_download_retried` | `repository`, `attempt` | The archive download broke off, and the job reads the archive again |
-| `files_skipped` | `excluded_path`, `too_large` | Files of the last archive left out: paths matching `excluded_path_patterns`, and files over `max_file_bytes` |
+| `files_skipped` | `excluded_path`, `too_large`, `too_small` | Files of the last archive left out: paths matching `excluded_path_patterns`, files over `max_file_bytes`, and files under `min_file_bytes` |
 | `repository_dropped` | `repository`, `reason` `not_found` | GitHub no longer has the repository or its archive |
 | `repository_collection_deleted` | `collection_id` | A repository left the selection, so its documents were deleted |
 | `owner_read_completed` | `owner`, `full_read`, `repositories_read`, `repositories_unchanged`, `collections_deleted` | The job finished reading the owner |
 
-The toolkit adds its own events to the same stream: `document_skipped` (with `reason` `empty_content` or `unsupported_content`), `document_delete_queued`, `collection_deleted`, `sweep_finished`, `job_terminated`, `job_start_failed`, `runtime_settings_invalid`, and `connector_implementation_failed`, which holds the exception's `stack_trace`.
+The toolkit adds its own events to the same stream: `document_skipped` (with `reason` `empty_content` or `unsupported_content`), `document_delete_queued`, `collection_deleted`, `sweep_finished`, `job_terminated`, `job_start_failed`, `runtime_settings_invalid`, and `connector_implementation_failed`, which holds the exception's `stack_trace`. At the end of every job that started, it writes one `collection_reported` event per collection, with the `collection_id` and its `counts`, then `job_reported`, with the `exit_code`, the number of `collections`, and the job's `total` counts: `written`, `unchanged`, `deleted`, `skipped` by reason, and `pending`.
 
 To read one event type of a job, filter its stream:
 
 ```bash
 aws logs filter-log-events --log-group-name /ccf/connectors/github-<owner> \
   --log-stream-names "<job ID>" --filter-pattern '{ $.message = "owner_read_completed" }'
+```
+
+To compare the totals of every job, query the log group with [CloudWatch Logs Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html) over the time range you choose:
+
+```text
+filter message = "job_reported"
+| fields @timestamp, @logStream, exit_code, total.written, total.unchanged, total.deleted, total.skipped.empty_content, total.skipped.unsupported_content
+| sort @timestamp desc
 ```
 
 ## Read a failed job
@@ -78,7 +86,7 @@ The repositories a failed job finished keep their new documents and checkpoints,
 
 The connector or the toolkit can leave a file out, or the knowledge base can miss an ingestion:
 
-1. Read the job's `files_skipped` events. `excluded_path` counts files that match `excluded_path_patterns`, and `too_large` counts files over `max_file_bytes`. A `document_skipped` event names a file the toolkit left out because it was empty or of a type the destination can't index.
+1. Read the job's `files_skipped` events. `excluded_path` counts files that match `excluded_path_patterns`, `too_large` counts files over `max_file_bytes`, and `too_small` counts files under `min_file_bytes`. A `document_skipped` event names a file the toolkit left out because its content was empty or only whitespace, or of a type the destination can't index.
 1. Check that the repository was selected. For an `ORG` source, the job lists the owner's repositories, most recently pushed first. It stops at the first repository with no push in `max_repository_age_days`, or once it has selected `max_repositories`. A name that matches `excluded_repository_patterns` is logged as `repository_excluded` and doesn't count toward `max_repositories`. A repository that leaves the selection is logged as `repository_collection_deleted`. `REPOSITORY` sources are read by name, and neither the age limit nor the name patterns apply to them.
 1. Check that the destination's last ingestion finished, as [Monitor your knowledge base](../developer-guide/troubleshooting.md#monitor-your-knowledge-base) describes.
 

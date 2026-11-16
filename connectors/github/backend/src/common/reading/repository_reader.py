@@ -117,7 +117,11 @@ class RepositoryReader:
         document_ids: list[str] = []
         with self._github.open_archive(repository) as archive:
             files = self._archive_reader.read(
-                ReadArchiveRequest(archive=archive, max_file_bytes=request.configuration.max_file_bytes)
+                ReadArchiveRequest(
+                    archive=archive,
+                    max_file_bytes=request.configuration.max_file_bytes,
+                    min_file_bytes=request.configuration.min_file_bytes,
+                )
             )
             for file in files:
                 document = self._document_builder.build(BuildDocumentRequest(repository=repository, file=file))

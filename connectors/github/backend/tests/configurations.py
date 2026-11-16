@@ -19,6 +19,7 @@ def make_configuration() -> GitHubConnectorConfiguration:
                 "excluded_repository_patterns": ["aws-sdk*", "*-sdk"],
                 "excluded_path_patterns": ["node_modules/", "__pycache__/", "*.py[cod]", "dist/", ".env", "*.so"],
                 "max_file_bytes": 1024,
+                "min_file_bytes": 1,
                 "full_read_interval_days": 28,
                 "github": {
                     "request_interval_seconds": 0.0,

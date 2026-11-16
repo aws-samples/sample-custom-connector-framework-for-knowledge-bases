@@ -53,11 +53,20 @@ class GitHubConnectorConfiguration(BaseModel):
     """gitignore-style patterns on the file path. A matching file is never stored."""
     max_file_bytes: int = Field(gt=0)
     """A larger file is never stored."""
+    min_file_bytes: int = Field(gt=0)
+    """A smaller file is never stored: it holds too little text to be useful in a search."""
     full_read_interval_days: int = Field(gt=0)
     """Every repository is read again this often, even without a new push."""
     github: GitHubAccessConfiguration
 
     def content_filters_hash(self) -> str:
         """A hash of every setting that changes the documents a repository produces."""
-        settings = "\0".join((DOCUMENT_FORMAT_VERSION, str(self.max_file_bytes), *self.excluded_path_patterns))
+        settings = "\0".join(
+            (
+                DOCUMENT_FORMAT_VERSION,
+                str(self.max_file_bytes),
+                str(self.min_file_bytes),
+                *self.excluded_path_patterns,
+            )
+        )
         return hashlib.sha256(settings.encode()).hexdigest()

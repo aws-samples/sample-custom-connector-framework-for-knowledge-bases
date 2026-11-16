@@ -36,3 +36,11 @@ def test_a_repository_that_isnt_a_name_without_its_owner_is_rejected(repository:
 
     with pytest.raises(ValidationError, match="repositories"):
         type(configuration).model_validate_json(configuration.model_dump_json())
+
+
+def test_a_new_minimum_file_size_changes_the_content_filters_hash_so_every_repository_is_read_again() -> None:
+    configuration = make_configuration()
+
+    raised = configuration.model_copy(update={"min_file_bytes": configuration.min_file_bytes + 1})
+
+    assert raised.content_filters_hash() != configuration.content_filters_hash()

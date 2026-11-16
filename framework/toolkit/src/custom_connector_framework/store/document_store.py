@@ -136,7 +136,7 @@ class DocumentStore:
             self._skip(_Skip(request=request, reason=SkipReason.UNSUPPORTED_CONTENT))
             return
         with content:
-            if media.is_text and content.blank:
+            if content.blank:
                 self._skip(_Skip(request=request, reason=SkipReason.EMPTY_CONTENT))
                 return
             self._write(_Write(request=request, media=media, content=content, access_control_use=access_control_use))

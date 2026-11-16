@@ -277,6 +277,7 @@ def test_a_renamed_document_whose_old_file_s3_refuses_to_delete_raises_with_the_
     ("doc", "reason"),
     [
         (Doc(document_id="notes", content=b"  \n\t"), SkipReason.EMPTY_CONTENT),
+        (Doc(document_id="notes", content=b"", media_type="application/pdf"), SkipReason.EMPTY_CONTENT),
         (
             Doc(document_id="notes", content=b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR", file_name="logo.png"),
             SkipReason.UNSUPPORTED_CONTENT,
@@ -301,6 +302,14 @@ def test_documents_bedrock_cant_ingest_are_skipped_with_their_reason(
     assert world.store.get_report().total.skipped.model_dump()[reason.value] == 1
     [record] = [record for record in caplog.records if record.message == "document_skipped"]
     assert (record.reason, record.document_id) == (reason.value, SourceIdKind.DOCUMENT.of("notes"))  # type: ignore[attr-defined]
+
+
+def test_a_binary_document_with_content_is_written(world: World) -> None:
+    pdf = Doc(document_id="guide.pdf", content=b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n1 0 obj\n")
+
+    world.put(pdf)
+
+    assert world.s3_calls("PutObject") == [f"{prefix(pdf)}guide.pdf.metadata.json", f"{prefix(pdf)}guide.pdf"]
 
 
 def test_the_store_builds_no_client_or_session(monkeypatch: pytest.MonkeyPatch) -> None:
